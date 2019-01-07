@@ -1,3 +1,3 @@
-# vendoree-samples
+# Payara Samples
 
-Samples for EE related/additional functionality that's specific to a vendor (such as JBoss, Payara, etc)
+This repository contains small Payara specific samples for EE related/additional functionality.
