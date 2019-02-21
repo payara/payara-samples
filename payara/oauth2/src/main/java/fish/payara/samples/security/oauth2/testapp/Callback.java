@@ -37,40 +37,34 @@
  *  only if the new code is made subject to such option by the copyright
  *  holder.
  */
-package fish.payara.security.oauth2.testapp;
+package fish.payara.samples.security.oauth2.testapp;
 
 import java.io.IOException;
 
-import javax.annotation.security.DeclareRoles;
+import javax.inject.Inject;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.HttpConstraint;
-import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import fish.payara.security.annotations.OAuth2AuthenticationDefinition;
+import fish.payara.security.oauth2.api.OAuth2AccessToken;
 
 /**
  *
- * @author jonathan
+ * @author jonathan coustick
  */
-@WebServlet("/Secured")
-@OAuth2AuthenticationDefinition(
-        authEndpoint = "http://localhost:8080/oauthtest/Endpoint", 
-        tokenEndpoint = "http://localhost:8080/oauthtest/Endpoint", 
-        clientId = "qwertyuiop", 
-        clientSecret = "asdfghjklzxcvbnm", 
-        redirectURI = "http://localhost:8080/oauthtest/Callback")
-@DeclareRoles("all")
-@ServletSecurity(@HttpConstraint(rolesAllowed = "all"))
-public class SecuredPage extends HttpServlet {
-
+@WebServlet("/Callback")
+public class Callback extends HttpServlet {
+    
     private static final long serialVersionUID = 1L;
-
+    
+    @Inject
+    OAuth2AccessToken token;
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.getWriter().println("This is a secured web page");
+        response.getWriter().println(token.getAccessToken());
     }
+    
 }

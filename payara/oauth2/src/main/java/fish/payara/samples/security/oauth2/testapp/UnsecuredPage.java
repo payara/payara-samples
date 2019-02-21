@@ -37,12 +37,10 @@
  *  only if the new code is made subject to such option by the copyright
  *  holder.
  */
-package fish.payara.security.oauth2.testapp;
+package fish.payara.samples.security.oauth2.testapp;
 
 import java.io.IOException;
 
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -53,54 +51,14 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author jonathan
  */
-@WebServlet("/Endpoint")
-public class Endpoint extends HttpServlet {
+@WebServlet("/Unsecured")
+public class UnsecuredPage extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        StringBuilder returnURL = new StringBuilder(request.getParameter("redirect_uri"));
-        returnURL.append("?&state=").append(request.getParameter("state"));
-        returnURL.append("&code=plokmijn");
-
-        if (!"code".equals(request.getParameter("response_type"))) {
-            response.sendError(401);
-        }
-        if (!"qwertyuiop".equals(request.getParameter("client_id"))) {
-            response.sendError(401);
-        }
-        response.sendRedirect(returnURL.toString());
+        response.getWriter().print("This is an unsecured web page");
     }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        boolean grantRight = "authorization_code".equals(request.getParameter("grant_type"));
-        boolean codeRight = "plokmijn".equals(request.getParameter("code"));
-        boolean clientRight = "qwertyuiop".equals(request.getParameter("client_id"));
-        boolean secretRight = "asdfghjklzxcvbnm".equals(request.getParameter("client_secret"));
-
-        JsonObjectBuilder jsonresponse = Json.createObjectBuilder();
-        if (grantRight && codeRight && clientRight&& secretRight) {
-
-            
-            jsonresponse.add("access_token", "qazwsxedc");
-            jsonresponse.add("state", request.getParameter("state"));
-            jsonresponse.add("token_type", "bearer");
-            String built = jsonresponse.build().toString();
-            response.getWriter().write(built);
-            response.setHeader("Cache-Control", "no-store");
-            response.setHeader("Pragma", "no-cache");
-
-        } else {
-            jsonresponse.add("error", "somethingwentwrong");
-            String errors = Boolean.toString(grantRight) + Boolean.toString(codeRight) + Boolean.toString(clientRight) + Boolean.toString(secretRight);
-            jsonresponse.add("error_desc", errors);
-            String built = jsonresponse.build().toString();
-            response.getWriter().write(built);
-            response.sendError(401);
-        }
-    }
-
+    
 }
