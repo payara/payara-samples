@@ -108,7 +108,7 @@
 		Each vendor is represented by one module. "test-utils" is a helper module.
 	-->
 	<modules>
-		<module>payara</module>
+		<module>samples</module>
 		<module>test-utils</module>
 	</modules>
 
