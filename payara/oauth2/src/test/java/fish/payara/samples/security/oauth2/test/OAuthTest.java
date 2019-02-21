@@ -37,7 +37,7 @@
  *  only if the new code is made subject to such option by the copyright
  *  holder.
  */
-package fish.payara.security.oauth2.test;
+package fish.payara.samples.security.oauth2.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -61,10 +61,10 @@ import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 
-import fish.payara.security.oauth2.testapp.Callback;
-import fish.payara.security.oauth2.testapp.Endpoint;
-import fish.payara.security.oauth2.testapp.SecuredPage;
-import fish.payara.security.oauth2.testapp.UnsecuredPage;
+import fish.payara.samples.security.oauth2.testapp.Callback;
+import fish.payara.samples.security.oauth2.testapp.Endpoint;
+import fish.payara.samples.security.oauth2.testapp.SecuredPage;
+import fish.payara.samples.security.oauth2.testapp.UnsecuredPage;
 
 /**
  *
