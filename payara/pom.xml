@@ -2,19 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"> <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.vendoree</groupId>
-        <artifactId>samples-parent</artifactId>
+        <groupId>fish.payara.samples</groupId>
+        <artifactId>parent-aggregator</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     
-    <groupId>org.vendoree.payara</groupId>
-    <artifactId>payara-parent</artifactId>
+    <groupId>fish.payara.samples</groupId>
+    <artifactId>samples-parent</artifactId>
     <packaging>pom</packaging>
     
-    <name>Vendor EE: Payara</name>
+    <name>Payara Samples - Payara</name>
 
     <modules>
         <module>jacc-per-app</module>
+        <module>jaxrs-rolesallowed</module>
+        <module>jaxrs-rolesallowed-servlet</module>
         <module>rolesPermitted</module>
         <module>oauth2</module>
         <module>openid</module>
@@ -22,7 +24,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.vendoree</groupId>
+            <groupId>fish.payara.samples</groupId>
             <artifactId>test-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
