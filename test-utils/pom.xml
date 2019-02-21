@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.vendoree</groupId>
-        <artifactId>samples-parent</artifactId>
+        <groupId>fish.payara.samples</groupId>
+        <artifactId>parent-aggregator</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     
     <artifactId>test-utils</artifactId>
-    <name>Vendor EE: test-utils</name>
+    <name>Payara Samples - test-utils</name>
 
     <dependencies>
         <dependency>
