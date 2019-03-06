@@ -1,0 +1,191 @@
+package fish.payara.samples.asadmin;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import org.glassfish.api.admin.config.ConfigExtension;
+import org.glassfish.common.util.admin.UnacceptableValueException;
+import org.glassfish.embeddable.CommandResult;
+import org.glassfish.embeddable.CommandResult.ExitStatus;
+import org.glassfish.embeddable.CommandRunner;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.internal.api.Globals;
+import org.glassfish.internal.api.Target;
+import org.hamcrest.CoreMatchers;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.jvnet.hk2.config.UnsatisfiedDependencyException;
+
+import com.sun.enterprise.config.serverbeans.Domain;
+import com.sun.enterprise.config.serverbeans.DomainExtension;
+
+@RunWith(Arquillian.class)
+public abstract class AsAdminTest {
+
+    private ServiceLocator habitat = Globals.getDefaultHabitat();
+    private CommandRunner runner;
+    private Target targetUtil;
+
+    @Deployment
+    public static Archive<?> deploy() {
+        return ShrinkWrap.create(JavaArchive.class)
+                .addClasses(AsAdminTest.class);
+    }
+
+    @Before
+    public final void setUpFields() {
+        runner = habitat.getService(CommandRunner.class);
+        targetUtil = habitat.getService(Target.class);
+    }
+
+    protected final CommandResult asadmin(String command, String... args) {
+        return new PlainCommandResult(runner.run(command, args));
+    }
+
+    protected final <T extends DomainExtension> T getDomainExtensionByType(Class<T> type) {
+        return habitat.getService(Domain.class).getExtensionByType(type);
+    }
+
+    protected final <T extends ConfigExtension> T getConfigExtensionByType(String target, Class<T> type) {
+        return targetUtil.getConfig(target).getExtensionByType(type);
+    }
+
+    protected final <T> T getService(Class<T> type) {
+        return habitat.getService(type);
+    }
+
+    protected static void assertUnchanged(boolean expected, boolean actual) {
+        assertEquals(Boolean.valueOf(expected), Boolean.valueOf(actual));
+    }
+
+    protected static void assertFalse(String flag) {
+        assertEquals("false", flag);
+    }
+
+    protected static void assertTrue(String flag) {
+        assertEquals("true", flag);
+    }
+    
+    protected static void assertTrue(boolean expression) {
+        org.junit.Assert.assertTrue(expression);
+    }
+    
+    protected static void assertTrue(String msg, boolean expression) {
+        org.junit.Assert.assertTrue(msg, expression);
+    }
+    
+    protected static void assertFalse(boolean expression) {
+        org.junit.Assert.assertFalse(expression);
+    }
+    
+    protected static void assertFalse(String msg, boolean expression) {
+        org.junit.Assert.assertFalse(msg, expression);
+    }
+
+    protected static void assertSuccess(CommandResult result) {
+        ExitStatus actual = result.getExitStatus();
+        if (ExitStatus.SUCCESS != actual) {
+            String msg = result.getOutput();
+            if (actual == ExitStatus.FAILURE && result.getFailureCause() != null) {
+                StringWriter writer = new StringWriter();
+                result.getFailureCause().printStackTrace(new PrintWriter(writer));
+                msg = writer.toString();
+            }
+            if (msg != null) {
+                assertEquals(msg, ExitStatus.SUCCESS, actual);
+            } else {
+                assertEquals(ExitStatus.SUCCESS, actual);
+            }
+        }
+    }
+
+    protected static void assertContains(String expected, String actual) {
+        assertThat(actual, CoreMatchers.containsString(expected));
+    }
+
+    protected static void assertFailure(CommandResult result) {
+        assertEquals(ExitStatus.FAILURE, result.getExitStatus());
+    }
+
+    private static void assertStatesUsage(CommandResult result) {
+        assertTrue("No usage was given.", result.getOutput().contains("Usage: "));
+    }
+
+    protected static void assertMissingParameter(String name, CommandResult result) {
+        assertFailure(result);
+        Throwable cause = result.getFailureCause();
+        assertNotNull(cause);
+        assertTrue("Error is not caused by a missing parameter but " + cause.getClass().getName(),
+                UnsatisfiedDependencyException.class.isAssignableFrom(cause.getClass()));
+        String text = result.getOutput();
+        int afterName = text.indexOf(" with class ");
+        int beforeName = text.substring(0, afterName).lastIndexOf('.');
+        String actualName = text.substring(beforeName + 1, afterName);
+        assertEquals("Error was about another parameter", name, actualName);
+        assertStatesUsage(result);
+    }
+
+    protected static void assertUnacceptableParameter(String name, CommandResult result) {
+        assertFailure(result);
+        Throwable cause = result.getFailureCause();
+        assertNotNull(cause);
+        assertTrue("Error is not caused by a unacceptable parameter but " + cause.getClass().getName(),
+                UnacceptableValueException.class.isAssignableFrom(cause.getClass()));
+        String text = result.getOutput();
+        try {
+            assertContains("Invalid parameter: " + name, text);
+        } catch (AssertionError e) {
+            assertContains("on parameter [ "+name+" ]", text);
+        }
+        assertStatesUsage(result);
+    }
+
+    private static final class PlainCommandResult implements CommandResult {
+
+        final CommandResult wrapped;
+
+        public PlainCommandResult(CommandResult wrapped) {
+            this.wrapped = wrapped;
+        }
+
+        @Override
+        public ExitStatus getExitStatus() {
+            return wrapped.getExitStatus();
+        }
+
+        @Override
+        public Throwable getFailureCause() {
+            return wrapped.getFailureCause();
+        }
+
+        @Override
+        public String getOutput() {
+            String output = wrapped.getOutput();
+            if (!output.startsWith("PlainTextActionReporter")) {
+                return output;
+            }
+            int index = output.indexOf("SUCCESS");
+            if (index < 0) {
+                index = output.indexOf("FAILURE");
+            }
+            if (index > 0) {
+                return output.substring(index + 7);
+            }
+            return output;
+        }
+
+        @Override
+        public String toString() {
+            return getExitStatus() + ": " + getOutput();
+        }
+    }
+}
