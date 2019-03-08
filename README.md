@@ -16,7 +16,7 @@ To successfully compile code in the `src/main/java` and `src/test/java` folders 
 
 **Running Tests**
 Tests depend on profile and version picked up from maven.
-This means running tests is straight forward using maven (`mvn integration-test`) but cannot easily be done from the IDE. 
+This means running tests is straight forward using maven (`mvn integration-test`) requires additional setup when done from the IDE. 
 Note that any test must have a `@Deployment` since otherwise the tests aren't deployed to the server and don't run.
 
 **Profiles**
