@@ -17,8 +17,6 @@ To successfully compile code in the `src/main/java` and `src/test/java` folders 
 **Running Tests**
 Tests depend on profile and version picked up from maven.
 This means running tests is straight forward using maven (`mvn integration-test`) but cannot easily be done from the IDE. 
-Maybe some IDEs have special maven based support?
-This also means running individual tests of a test class is not easily done.
 Note that any test must have a `@Deployment` since otherwise the tests aren't deployed to the server and don't run.
 
 **Profiles**
@@ -26,13 +24,13 @@ Note that any test must have a `@Deployment` since otherwise the tests aren't de
   connects to a running server (cannot be micro)
 
 * `payara5`: 
-  downloads, installs and runs tests on a Payara 5 with `{$payara.version}` (maven property)
+  downloads, installs and runs tests on a Payara 5 with `{$payara.version}` (use with `-Dpayara-version=???`)
 
 * `payara4`: 
-  downloads, installs and runs tests on a Payara 4 with `{$payara.version}` (maven property)
+  downloads, installs and runs tests on a Payara 4 with `{$payara.version}` (use with `-Dpayara-version=???`)
 
 **Debugging**
-Running tests from the IDE does not work as tests depend on maven properties.
+Running tests from the IDE requires to setup the required maven properties for the profile to use and maybe the payara-version.
 Using `-Dmaven.surefire.debug` to connect the IDE to tests started from command line works but will **not** pause at a breakpoint since the VM connect to this way is not the VM running the test code. Tests run in the VM of the started Payara server.
 Instead build, deploy and start a Payara server in debug from your IDE (or connect to it). 
 Then run the tests with `mvn integration-test -Ppayara-server-remote`. As tests get deployed to the started server and run in the server's VM this now pauses at the set breakpoints.
