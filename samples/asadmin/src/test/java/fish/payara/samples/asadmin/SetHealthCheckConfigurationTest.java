@@ -58,7 +58,7 @@ import fish.payara.nucleus.notification.log.LogNotifier;
 /**
  * Verifies the correctness of the {@code SetHealthCheckConfiguration} command.
  */
-public class SetHealthCheckConfigurationTest extends AsAdminTest {
+public class SetHealthCheckConfigurationTest extends AsadminTest {
 
     private HealthCheckServiceConfiguration config;
     private HealthCheckService service;
@@ -70,12 +70,12 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_EnabledIsMandatory() {
+    public void enabledIsMandatory() {
         assertMissingParameter("enabled", asadmin("set-healthcheck-configuration"));
     }
 
     @Test
-    public void setHealthcheckConfiguration_Enabled() {
+    public void enabledAffectsConfigButNotService() {
         boolean enabled = service.isEnabled();
         asadmin("set-healthcheck-configuration", 
                 "--enabled", "false");
@@ -95,7 +95,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_EnabledDynamic() {
+    public void enabledDynamicAffectsConfigAndService() {
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "true", 
                 "--dynamic", "true");
@@ -109,7 +109,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_EnabledAppliesToLogNotifier() {
+    public void enabledAppliesToLogNotifier() {
         boolean logEnabled = getLogNotifierOptions().isEnabled();
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "false");
@@ -125,7 +125,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_EnabledDynamicAppliesToLogNotifier() {
+    public void enabledDynamicAppliesToLogNotifier() {
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "false",
                 "--dynamic", "true");
@@ -142,7 +142,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_HistoricalTraceEnabled() {
+    public void historicalTraceEnabledAffectsConfigButNotService() {
         boolean historicalTraceEnabled = service.isHistoricalTraceEnabled();
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "true", 
@@ -159,7 +159,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_HistoricalTraceEnabledDynamic() {
+    public void historicalTraceEnabledDynamicAffectsConfigAndService() {
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "true",
                 "--historical-trace-enabled", "true", 
@@ -175,7 +175,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_HistoricalTraceStoreSize() {
+    public void historicalTraceStoreSizeAffectsConfigButNotService() {
         Integer historicalTraceStoreSize = service.getHistoricalTraceStoreSize();
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "true", 
@@ -186,7 +186,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_HistoricalTraceStoreSizeDynamic() {
+    public void historicalTraceStoreSizeDynamicAffectsConfigAndService() {
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "true", 
                 "--historical-trace-store-size", "13",
@@ -197,7 +197,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_HistoricalTraceStoreTimeout() {
+    public void historicalTraceStoreTimeoutAffectsConfigButNotService() {
         Long historicalTraceStoreTimeout = getHistoricalTraceStoreTimeout();
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "true", 
@@ -208,7 +208,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_HistoricalTraceStoreTimeoutDynamic() {
+    public void historicalTraceStoreTimeoutDynamicAffectsConfigAndService() {
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "true", 
                 "--historical-trace-store-timeout", "42",
@@ -219,7 +219,7 @@ public class SetHealthCheckConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHealthcheckConfiguration_HistoricalTraceStoreSizeBelowMinimum() {
+    public void historicalTraceStoreSizeBelowMinimumCausesError() {
         CommandResult result = asadmin("set-healthcheck-configuration", 
                 "--enabled", "true", 
                 "--historical-trace-store-size", "0");

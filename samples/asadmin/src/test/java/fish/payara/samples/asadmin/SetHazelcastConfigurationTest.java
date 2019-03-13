@@ -48,7 +48,7 @@ import fish.payara.nucleus.hazelcast.HazelcastRuntimeConfiguration;
 /**
  * Verifies the correctness of the {@code SetHazelcastConfiguration} command.
  */
-public class SetHazelcastConfigurationTest extends AsAdminTest {
+public class SetHazelcastConfigurationTest extends AsadminTest {
 
     private HazelcastRuntimeConfiguration config;
 
@@ -58,7 +58,7 @@ public class SetHazelcastConfigurationTest extends AsAdminTest {
     }
 
     @Test
-    public void setHazelcastConfiguration_AutoIncrementPort() {
+    public void autoIncrementPort() {
         CommandResult result = asadmin("set-hazelcast-configuration",
                 "--autoIncrementPort", "true");
         assertSuccess(result); 

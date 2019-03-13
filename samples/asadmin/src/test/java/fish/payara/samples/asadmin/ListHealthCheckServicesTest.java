@@ -45,7 +45,7 @@ import org.junit.Test;
 /**
  * Verifies the correctness of the {@code ListHealthCheckServices} command.
  */
-public class ListHealthCheckServicesTest extends AsAdminTest {
+public class ListHealthCheckServicesTest extends AsadminTest {
 
     @Test
     public void listHealthCheckServices() {

@@ -68,30 +68,30 @@ import com.sun.enterprise.config.serverbeans.Domain;
 import com.sun.enterprise.config.serverbeans.DomainExtension;
 
 @RunWith(Arquillian.class)
-public abstract class AsAdminTest {
+public abstract class AsadminTest {
 
-    private ServiceLocator habitat = Globals.getDefaultHabitat();
-    private CommandRunner runner;
+    private ServiceLocator serviceLocator = Globals.getDefaultHabitat();
+    private CommandRunner commandRunner;
     private Target targetUtil;
 
     @Deployment
     public static Archive<?> deploy() {
         return ShrinkWrap.create(JavaArchive.class)
-                .addClasses(AsAdminTest.class);
+                .addClasses(AsadminTest.class);
     }
 
     @Before
     public final void setUpFields() {
-        runner = habitat.getService(CommandRunner.class);
-        targetUtil = habitat.getService(Target.class);
+        commandRunner = serviceLocator.getService(CommandRunner.class);
+        targetUtil = serviceLocator.getService(Target.class);
     }
 
     protected final CommandResult asadmin(String command, String... args) {
-        return new PlainCommandResult(runner.run(command, args));
+        return new PlainCommandResult(commandRunner.run(command, args));
     }
 
     protected final <T extends DomainExtension> T getDomainExtensionByType(Class<T> type) {
-        return habitat.getService(Domain.class).getExtensionByType(type);
+        return serviceLocator.getService(Domain.class).getExtensionByType(type);
     }
 
     protected final <T extends ConfigExtension> T getConfigExtensionByType(String target, Class<T> type) {
@@ -99,7 +99,7 @@ public abstract class AsAdminTest {
     }
 
     protected final <T> T getService(Class<T> type) {
-        return habitat.getService(type);
+        return serviceLocator.getService(type);
     }
 
     protected static void assertUnchanged(boolean expected, boolean actual) {

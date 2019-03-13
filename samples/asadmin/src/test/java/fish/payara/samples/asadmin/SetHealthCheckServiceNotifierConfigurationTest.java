@@ -53,7 +53,7 @@ import fish.payara.nucleus.notification.log.LogNotifier;
 /**
  * Verifies the correctness of the {@code SetHealthCheckServiceNotifierConfiguration} command.
  */
-public class SetHealthCheckServiceNotifierConfigurationTest extends AsAdminTest {
+public class SetHealthCheckServiceNotifierConfigurationTest extends AsadminTest {
 
     private HealthCheckServiceConfiguration config;
     private HealthCheckService service;
@@ -65,19 +65,19 @@ public class SetHealthCheckServiceNotifierConfigurationTest extends AsAdminTest 
     }
 
     @Test
-    public void setHealthCheckServiceConfiguration_EnabledIsMandatory() {
+    public void enabledIsMandatory() {
         assertMissingParameter("enabled", asadmin("set-healthcheck-service-notifier-configuration", 
                 "--notifier", "LOG"));
     }
 
     @Test
-    public void setHealthCheckServiceConfiguration_NotifierIsMandatory() {
+    public void notifierIsMandatory() {
         assertMissingParameter("notifierName", asadmin("set-healthcheck-service-notifier-configuration", 
                 "--enabled", "true"));
     }
 
     @Test
-    public void setHealthCheckServiceConfiguration_NotifierNames() {
+    public void notifierNamesAreAccepted() {
         String[] names = { "LOG", "HIPCHAT", "SLACK", "JMS", "EMAIL", "XMPP", "SNMP", "EVENTBUS", "NEWRELIC",
                 "DATADOG", "CDIEVENTBUS" };
         for (String notiferName : names) {
@@ -89,7 +89,7 @@ public class SetHealthCheckServiceNotifierConfigurationTest extends AsAdminTest 
     }
 
     @Test
-    public void setHealthCheckServiceConfiguration_Enabled() {
+    public void enabledAffectsConfigButNotService() {
         boolean logEnabled = getLogNotifierOptions().isEnabled();
         CommandResult result = asadmin("set-healthcheck-service-notifier-configuration", 
                 "--notifier", "LOG",
@@ -106,7 +106,7 @@ public class SetHealthCheckServiceNotifierConfigurationTest extends AsAdminTest 
     }
 
     @Test
-    public void setHealthCheckServiceConfiguration_EnabledDynamic() {
+    public void enabledDynamicAffectsConfigAndService() {
         ensureHealthChecksAreEnabled();
         CommandResult result = asadmin("set-healthcheck-service-notifier-configuration", 
                 "--notifier", "LOG",
@@ -125,7 +125,7 @@ public class SetHealthCheckServiceNotifierConfigurationTest extends AsAdminTest 
     }
 
     @Test
-    public void setHealthCheckServiceConfiguration_Noisy() {
+    public void noisyAffectsConfigButNotService() {
         boolean logNoisy = getLogNotifierOptions().isNoisy();
         CommandResult result = asadmin("set-healthcheck-service-notifier-configuration", 
                 "--notifier", "LOG",
@@ -144,7 +144,7 @@ public class SetHealthCheckServiceNotifierConfigurationTest extends AsAdminTest 
     }
 
     @Test
-    public void setHealthCheckServiceConfiguration_NoisyDynamic() {
+    public void noisyDynamicAffectsConfigAndService() {
         ensureHealthChecksAreEnabled();
         CommandResult result = asadmin("set-healthcheck-service-notifier-configuration", 
                 "--notifier", "LOG",
