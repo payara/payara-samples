@@ -60,7 +60,7 @@ public class ShutdownGraceSystemPropertyIT {
         long afterShutdown = System.currentTimeMillis();
         long delay = afterShutdown - beforeShutdown;
         assertTrue("a grace period of at least 3 sec was expected", delay > 3000);
-        assertTrue("grace period should not hold shutdown much longer", delay < 5000);
+        assertTrue("grace period should not hold shutdown much longer", delay < 8000);
     }
 
     @After

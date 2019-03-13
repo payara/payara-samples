@@ -76,14 +76,14 @@ public final class PayaraMicroServer {
         return INSTANCE;
     }
 
-    private static final String GALSSFISH_CLASS_NAME = "org.glassfish.embeddable.GlassFish";
+    private static final String GLASSFISH_CLASS_NAME = "org.glassfish.embeddable.GlassFish";
     private static final String SERVICE_LOCATOR_CLASS_NAME = "org.glassfish.hk2.api.ServiceLocator";
 
     private static final int defaultHttpPort = 28989;
 
-    private final AtomicBoolean starting = new AtomicBoolean(false);
-    private final AtomicBoolean stopping = new AtomicBoolean(false);
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean isStarting = new AtomicBoolean(false);
+    private final AtomicBoolean isStopping = new AtomicBoolean(false);
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
     private int httpPort;
     private String[] options;
@@ -125,8 +125,8 @@ public final class PayaraMicroServer {
                 args[args.length - 2] = "--port";
                 args[args.length - 1] = "" + port;
             }
-            if (!starting.compareAndSet(false, true)) {
-                if (running.get()) {
+            if (!isStarting.compareAndSet(false, true)) {
+                if (isRunning.get()) {
                     if (Arrays.equals(options, args)) {
                         return; // started with same options already
                     }
@@ -139,7 +139,7 @@ public final class PayaraMicroServer {
         } catch (Exception e) {
             asAssertionError("Failed to start micro server", e);
         } finally {
-            starting.set(false);
+            isStarting.set(false);
         }
     }
 
@@ -157,14 +157,14 @@ public final class PayaraMicroServer {
         this.httpPort = port;
         this.boot = boot;
         runtime = boot.getRuntime();
-        if (running.compareAndSet(false, true)) {
-            starting.set(false);
+        if (isRunning.compareAndSet(false, true)) {
+            isStarting.set(false);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> stop()));
         }
         instance = getField(PayaraInstance.class, runtime);
         // classes are on the CP of the server but not of the test
         serverClassLoader = instance.getClass().getClassLoader();
-        glassfish = getField(getClass(GALSSFISH_CLASS_NAME), runtime);
+        glassfish = getField(getClass(GLASSFISH_CLASS_NAME), runtime);
         serviceLocator = getField(getClass(SERVICE_LOCATOR_CLASS_NAME), glassfish);
     }
 
@@ -172,21 +172,21 @@ public final class PayaraMicroServer {
         if (!isStarted()) {
             return; // don't try to stop if not started successfully
         }
-        if (!stopping.compareAndSet(false, true)) {
+        if (!isStopping.compareAndSet(false, true)) {
             return; // already stopping...
         }
         try {
             boot.shutdown();
-            running.set(false);
+            isRunning.set(false);
         } catch (Exception e) {
             // ignore...
         } finally {
-            stopping.set(false);
+            isStopping.set(false);
         }
     }
 
     private boolean isStarted() {
-        return running.get();
+        return isRunning.get();
     }
 
     public int getHttpPort() {
