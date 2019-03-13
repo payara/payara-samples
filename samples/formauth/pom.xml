@@ -35,7 +35,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>formath</artifactId>
+    <artifactId>formauth</artifactId>
     <name>Payara Samples - Payara - FORM Auth</name>
     <packaging>war</packaging>
 
