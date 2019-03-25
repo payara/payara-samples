@@ -32,6 +32,45 @@ import java.util.logging.Logger;
 public class ServerOperations {
     
     private static final Logger logger = Logger.getLogger(ServerOperations.class.getName());
+    
+    /**
+     * Add the default test user and credentials to the identity store of
+     * supported containers
+     */
+    public static void addUserToContainerIdentityStore(String username, String groups) {
+
+        // TODO: abstract adding container managed users to utility class
+        // TODO: consider PR for sending CLI commands to Arquillian
+
+        String javaEEServer = System.getProperty("javaEEServer");
+
+        if ("glassfish-remote".equals(javaEEServer) || "payara-remote".equals(javaEEServer)) {
+
+            System.out.println("Adding user for glassfish-remote");
+
+            List<String> cmd = new ArrayList<>();
+
+            cmd.add("create-file-user");
+            cmd.add("--groups");
+            cmd.add(groups);
+            cmd.add("--passwordfile");
+            cmd.add(Paths.get("").toAbsolutePath() + "/src/test/resources/password.txt");
+
+            cmd.add(username);
+
+            CliCommands.payaraGlassFish(cmd);
+        } else {
+            if (javaEEServer == null) {
+                System.out.println("javaEEServer not specified");
+            } else {
+                System.out.println(javaEEServer + " not supported");
+            }
+        }
+
+        // TODO: support other servers than Payara and GlassFish
+
+        // WildFly ./bin/add-user.sh -a -u u1 -p p1 -g g1
+    }
 
     /**
      * Add the default test user and credentials to the identity store of 

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.samples.rolespermitted;
+package fish.payara.samples.loginmodule.realm.custom;
 
 import static fish.payara.samples.ServerOperations.addMavenJarsToContainerLibFolder;
 import static org.junit.Assert.assertTrue;
@@ -69,6 +69,7 @@ import fish.payara.samples.CliCommands;
 import fish.payara.samples.ServerOperations;
 import fish.payara.samples.loginmodule.realm.custom.CustomLoginModule;
 import fish.payara.samples.loginmodule.realm.custom.CustomRealm;
+import fish.payara.samples.loginmodule.realm.custom.TestServlet;
 
 @RunWith(Arquillian.class)
 public class CustomLoginModuleRealmTest {
@@ -83,7 +84,8 @@ public class CustomLoginModuleRealmTest {
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
         
-        addMavenJarsToContainerLibFolder("pom.xml", "fish.payara.samples:custom-loginmodule-realm");
+        addMavenJarsToContainerLibFolder("pom.xml", "fish.payara.samples:loginmodule-realm-impl");
+        ServerOperations.restartContainer();
         
         List<String> cmd = new ArrayList<>();
         

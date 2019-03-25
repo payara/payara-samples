@@ -10,13 +10,13 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>loginmodule-realm</artifactId>
+    <artifactId>custom-loginmodule-realm</artifactId>
     <packaging>pom</packaging>
-    <name>Payara Samples - LoginModule/Realm</name>
+    <name>Payara Samples - Payara - Custom LoginModule/Realm</name>
     
     <modules>
-        <module>custom-loginmodule-realm</module>
-        <module>test-loginmodule-realm</module>
+        <module>loginmodule-realm-impl</module>
+        <module>loginmodule-realm-test</module>
     </modules>
 
 </project>

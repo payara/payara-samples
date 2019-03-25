@@ -10,9 +10,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>custom-loginmodule-realm</artifactId>
+    <artifactId>loginmodule-realm-impl</artifactId>
     <packaging>jar</packaging>
-    <name>Payara Samples - Payara - Custom LoginModule/Realm</name>
+    <name>Payara Samples - Payara - Custom LoginModule/Realm - Implementation</name>
 
     <dependencies>
         <dependency>

@@ -13,6 +13,7 @@
     <name>Payara Samples - Payara</name>
 
     <modules>
+        <module>custom-loginmodule-realm</module>
         <module>jacc-per-app</module>
         <module>jaxrs-rolesallowed</module>
         <module>jaxrs-rolesallowed-servlet</module>
