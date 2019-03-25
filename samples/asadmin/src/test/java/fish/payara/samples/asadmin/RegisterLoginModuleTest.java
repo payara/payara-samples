@@ -90,8 +90,7 @@ public class RegisterLoginModuleTest extends AsadminTest {
         try (
                 Reader reader = new FileReader(loginConf);
         ) {
-            String contents = CharStreams.toString(reader);
-            return contents;
+            return CharStreams.toString(reader);
         }
     }
 
