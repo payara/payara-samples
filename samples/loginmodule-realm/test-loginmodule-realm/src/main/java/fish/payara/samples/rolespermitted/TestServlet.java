@@ -37,66 +37,41 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.samples.loginmodule.realm.custom;
+package fish.payara.samples.rolespermitted;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.enumeration;
+import java.io.IOException;
 
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Properties;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.HttpConstraint;
+import javax.servlet.annotation.ServletSecurity;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.jvnet.hk2.annotations.Service;
 
-import com.sun.enterprise.security.BaseRealm;
-import com.sun.enterprise.security.auth.realm.BadRealmException;
-import com.sun.enterprise.security.auth.realm.InvalidOperationException;
-import com.sun.enterprise.security.auth.realm.NoSuchRealmException;
-import com.sun.enterprise.security.auth.realm.NoSuchUserException;
-import com.sun.enterprise.security.auth.realm.Realm;
+@WebServlet(urlPatterns = "/testServlet")
+@ServletSecurity(@HttpConstraint(rolesAllowed = "realmGroup"))
+public class TestServlet extends HttpServlet {
 
-/**
- * Realm wrapper for supporting Custom authentication.
- *
- */
-@Service
-public final class CustomRealm extends BaseRealm {
-
-    public static final String AUTH_TYPE = "custom";
+    private static final long serialVersionUID = 1L;
 
     @Override
-    public synchronized void init(Properties props) throws BadRealmException, NoSuchRealmException {
-        super.init(props);
-        
-        String jaasCtx = props.getProperty(Realm.JAAS_CONTEXT_PARAM);
-        if (jaasCtx == null) {
-            throw new BadRealmException("No jaas-context specified");
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        response.getWriter().write("This is a test servlet \n");
+
+        String webName = null;
+        if (request.getUserPrincipal() != null) {
+            webName = request.getUserPrincipal().getName();
         }
 
-        setProperty(Realm.JAAS_CONTEXT_PARAM, jaasCtx);
+        response.getWriter().write("web username: " + webName + "\n");
+
+        boolean webHasRole = request.isUserInRole("realmGroup");
+
+        response.getWriter().write("web user has role \"realmGroup\": " + webHasRole + "\n");
     }
 
-    @Override
-    public String getAuthType() {
-        return AUTH_TYPE;
-    }
-   
-    public String[] authenticate(String username, char[] password) {
-        if ("realmUser".equals(username) && Arrays.equals(password, "realmPassword".toCharArray())) {
-            return new String[] {"realmGroup"};
-        }
-        
-        return null;
-    }
     
-    @Override
-    public Enumeration<String> getGroupNames(String username) throws InvalidOperationException, NoSuchUserException {
-        if ("realmUser".equals(username)) {
-            return enumeration(asList("realmGroup"));
-        }
-        
-        return enumeration(emptyList());
-    }
-
 }

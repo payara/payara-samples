@@ -16,6 +16,7 @@
     
     <modules>
         <module>custom-loginmodule-realm</module>
+        <module>test-loginmodule-realm</module>
     </modules>
 
 </project>
