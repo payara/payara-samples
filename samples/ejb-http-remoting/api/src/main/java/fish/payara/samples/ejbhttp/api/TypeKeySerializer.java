@@ -40,37 +40,26 @@
 
 package fish.payara.samples.ejbhttp.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+import java.util.function.Supplier;
 
-public interface RemoteService {
-    int simpleOperation(String string, Double boxed);
+public class TypeKeySerializer implements JsonbSerializer<Supplier<?>> {
 
-    List<String> elementaryListOperation(int size);
-
-    Map<String, String> elementaryMapOperation(int size);
-
-
-    User createSimpleUser();
-    Optional<User> createOptionalUser(boolean empty);
-    User createNestedUser();
-
-    List<User> listUsers(List<String> ids);
-
-    String[] someIds(User... users);
-
-    Stuff.Container polymorphicReturn(boolean returnNull);
-
-    List<Stuff.Container> polymorphicReturn(int size);
-
-    int countProducts(List<Stuff.Container> polymorphicArgument);
-
-    /*
-     More things to test:
-     a Java Bean
-     Polymorphism via type adapter
-     array and vararg methods
-     exceptions
-     */
+    @Override
+    public void serialize(Supplier<?> obj, JsonGenerator generator, SerializationContext ctx) {
+        if (obj == null) {
+            generator.writeNull();
+        } else {
+            Object value = obj.get();
+            if (value == null) {
+                generator.writeNull();
+            } else {
+                generator.writeStartObject();
+                ctx.serialize(value.getClass().getName(), value, generator);
+                generator.writeEnd();
+            }
+        }
+    }
 }

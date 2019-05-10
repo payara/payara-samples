@@ -40,14 +40,16 @@
 
 package fish.payara.samples.ejbhttp.server;
 
+import fish.payara.samples.ejbhttp.api.Product;
+import fish.payara.samples.ejbhttp.api.Ranking;
 import fish.payara.samples.ejbhttp.api.RemoteService;
+import fish.payara.samples.ejbhttp.api.Stuff;
 import fish.payara.samples.ejbhttp.api.User;
 
-import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,14 +140,44 @@ public class RemoteServiceBean implements RemoteService {
         return Stream.of(users).map(user -> user.login).toArray(String[]::new);
     }
 
+    @Override
+    public List<Stuff.Container> polymorphicReturn(int size) {
+        return IntStream.range(0, size).mapToObj(i -> random.nextBoolean() ? createProduct(i) : createRanking(i))
+                .collect(toList());
+    }
+
+    private Stuff.Container createRanking(int i) {
+        return new Stuff.Container(new Ranking(UUID.randomUUID().toString(), i));
+    }
+
+    @Override
+    public Stuff.Container polymorphicReturn(boolean returnNull) {
+        if (returnNull) {
+            return null;
+        }
+        return random.nextBoolean() ? createProduct(random.nextInt(300)) : createRanking(random.nextInt(10));
+    }
+
+    @Override
+    public int countProducts(List<Stuff.Container> polymorphicArgument) {
+        if (polymorphicArgument == null) {
+            return -1;
+        }
+        return (int) polymorphicArgument.stream().map(Stuff.Container::get).filter(Product.class::isInstance).count();
+    }
+
     private Random random = new Random();
+
+    private Stuff.Container createProduct(int price) {
+        return new Stuff.Container(new Product(UUID.randomUUID().toString(), new BigDecimal(price)));
+    }
 
     private User createUser(int numFriends) {
         User result = new User();
         result.login = UUID.randomUUID().toString();
         result.createdAt = LocalDate.now().minusDays(random.nextInt(3000));
         if (numFriends > 0) {
-            result.friends = IntStream.range(0, numFriends).mapToObj(i -> createUser(random.nextInt(numFriends >> 1))).collect(toList());
+            result.friends = IntStream.range(0, numFriends).mapToObj(i -> createUser(random.nextInt(Math.max(1, numFriends >> 1)))).collect(toList());
         }
         return result;
     }

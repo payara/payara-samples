@@ -38,23 +38,24 @@
  *    holder.
  */
 
+import fish.payara.samples.ejbhttp.api.Product;
+import fish.payara.samples.ejbhttp.api.Ranking;
 import fish.payara.samples.ejbhttp.api.RemoteService;
-import fish.payara.samples.ejbhttp.api.User;
+import fish.payara.samples.ejbhttp.api.Stuff;
 import fish.payara.samples.ejbhttp.client.RemoteConnector;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.naming.NamingException;
-import java.util.Collections;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
-public class CollectionTypesIT {
+public class CustomizedTypesIT {
     static RemoteService remoteService;
 
     @BeforeClass
@@ -63,82 +64,42 @@ public class CollectionTypesIT {
     }
 
     @Test
-    public void testElementaryListReturnNull() {
-        List<String> result = remoteService.elementaryListOperation(-1);
-        assertNull(result);
+    public void annotatedSerializerTopLevelReturn() {
+        int rankings=0, products = 0;
+        for(int i=0; i<100 && (rankings == 0 || products == 0); i++) {
+            Stuff result = remoteService.polymorphicReturn(false).get();
+            if (result instanceof Product) {
+                products++;
+            } else if (result instanceof Ranking) {
+                rankings++;
+            } else {
+                fail("What the hell is "+result);
+            }
+        }
+        assertThat(rankings).isGreaterThan(0);
+        assertThat(products).isGreaterThan(0);
     }
 
     @Test
-    public void testElementaryListReturnEmpty() {
-        List<String> result = remoteService.elementaryListOperation(0);
-        assertThat(result).isEmpty();
+    public void annotatedSerializerTopLevelReturnNull() {
+        assertThat(remoteService.polymorphicReturn(true).get()).isNull();
     }
 
     @Test
-    public void testElementaryList() {
-        List<String> result = remoteService.elementaryListOperation(10);
-        assertThat(result).hasSize(10);
+    public void annotatedSerializerContainerReturn() {
+        List<Stuff.Container> result = remoteService.polymorphicReturn(100);
+        assertThat(result).hasSize(100)
+            .extracting(Stuff.Container::get).allMatch(Stuff.class::isInstance);
     }
 
     @Test
-    public void testElementaryMapReturnNull() {
-        Map<String, String> result = remoteService.elementaryMapOperation(-1);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    public void testElementaryMapReturnEmpty() {
-        Map<String, String> result = remoteService.elementaryMapOperation(0);
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    public void testElementaryMap() {
-        Map<String, String> result = remoteService.elementaryMapOperation(10);
-        assertThat(result).hasSize(10);
-    }
-
-    @Test
-    public void testListReturnAndArgNull() {
-        List<User> result = remoteService.listUsers(null);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    public void testListResultAndArgEmpty() {
-        List<User> result = remoteService.listUsers(Collections.emptyList());
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    public void testListResultAndArg() {
-        List<String> input = IntStream.range(0, 10).mapToObj(i -> "User" + i).collect(Collectors.toList());
-        List<User> result = remoteService.listUsers(input);
-        assertThat(result).hasSize(10)
-                .extracting(u -> u.login).zipSatisfy(input, (remote, local) -> remote.equals(local));
-    }
-
-    @Test
-    public void testArrayReturnAndArgNull() {
-        String[] result = remoteService.someIds(null);
-        assertThat(result).isNull();
-    }
-
-    @Test
-    public void testArrayResultAndArgEmpty() {
-        String[] result = remoteService.someIds(new User[0]);
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    public void testArrayResultAndArg() {
-        User[] input = IntStream.range(0, 10).mapToObj(i -> {
-            User u = new User();
-            u.login = "User" + i;
-            return u;
-        }).toArray(User[]::new);
-        String[] result = remoteService.someIds(input);
-        assertThat(result).zipSatisfy(input, (remote, local) -> remote.equals(local.login));
+    public void annotatedSerializerContainerArgument() {
+        int result = remoteService.countProducts(Stream.of(
+                new Product("1", BigDecimal.ONE),
+                new Ranking("1", 4),
+                new Product("2", BigDecimal.ZERO)
+        ).map(Stuff.Container::new).collect(toList()));
+        assertThat(result).isEqualTo(2);
     }
 
 }

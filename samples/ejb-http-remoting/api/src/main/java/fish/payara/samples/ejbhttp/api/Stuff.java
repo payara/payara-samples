@@ -40,37 +40,28 @@
 
 package fish.payara.samples.ejbhttp.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import javax.json.bind.annotation.JsonbTypeDeserializer;
+import javax.json.bind.annotation.JsonbTypeSerializer;
+import java.util.function.Supplier;
 
-public interface RemoteService {
-    int simpleOperation(String string, Double boxed);
+/**
+ * It is impossible to do top level polymorphism with JSON-B.
+ * One needs to create container outside of hierarchy that will host the mapping.
+ */
+public interface Stuff {
 
-    List<String> elementaryListOperation(int size);
+    @JsonbTypeSerializer(TypeKeySerializer.class)
+    @JsonbTypeDeserializer(TypeKeyDeserializer.class)
+    class Container implements Supplier<Stuff> {
+        private Stuff instance;
 
-    Map<String, String> elementaryMapOperation(int size);
+        public Container(Stuff instance) {
+            this.instance = instance;
+        }
 
-
-    User createSimpleUser();
-    Optional<User> createOptionalUser(boolean empty);
-    User createNestedUser();
-
-    List<User> listUsers(List<String> ids);
-
-    String[] someIds(User... users);
-
-    Stuff.Container polymorphicReturn(boolean returnNull);
-
-    List<Stuff.Container> polymorphicReturn(int size);
-
-    int countProducts(List<Stuff.Container> polymorphicArgument);
-
-    /*
-     More things to test:
-     a Java Bean
-     Polymorphism via type adapter
-     array and vararg methods
-     exceptions
-     */
+        @Override
+        public Stuff get() {
+            return instance;
+        }
+    }
 }

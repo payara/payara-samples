@@ -40,37 +40,18 @@
 
 package fish.payara.samples.ejbhttp.api;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.math.BigDecimal;
 
-public interface RemoteService {
-    int simpleOperation(String string, Double boxed);
+public class Product implements Stuff {
+    public String productId;
+    public BigDecimal price;
 
-    List<String> elementaryListOperation(int size);
+    public Product() {
 
-    Map<String, String> elementaryMapOperation(int size);
+    }
 
-
-    User createSimpleUser();
-    Optional<User> createOptionalUser(boolean empty);
-    User createNestedUser();
-
-    List<User> listUsers(List<String> ids);
-
-    String[] someIds(User... users);
-
-    Stuff.Container polymorphicReturn(boolean returnNull);
-
-    List<Stuff.Container> polymorphicReturn(int size);
-
-    int countProducts(List<Stuff.Container> polymorphicArgument);
-
-    /*
-     More things to test:
-     a Java Bean
-     Polymorphism via type adapter
-     array and vararg methods
-     exceptions
-     */
+    public Product(String productId, BigDecimal price) {
+        this.productId = productId;
+        this.price = price;
+    }
 }
