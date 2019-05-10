@@ -47,6 +47,7 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -112,6 +114,28 @@ public class RemoteServiceBean implements RemoteService {
     @Override
     public User createNestedUser() {
         return createUser(10);
+    }
+
+    @Override
+    public List<User> listUsers(List<String> ids) {
+        if (ids == null) {
+            return null;
+        }
+        return ids.stream().map(id -> {
+                    User u = new User();
+                    u.login = id;
+                    u.createdAt = LocalDate.now();
+                    return u;
+                }
+            ).collect(toList());
+    }
+
+    @Override
+    public String[] someIds(User... users) {
+        if (users == null) {
+            return null;
+        }
+        return Stream.of(users).map(user -> user.login).toArray(String[]::new);
     }
 
     private Random random = new Random();

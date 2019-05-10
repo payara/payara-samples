@@ -56,6 +56,10 @@ public interface RemoteService {
     Optional<User> createOptionalUser(boolean empty);
     User createNestedUser();
 
+    List<User> listUsers(List<String> ids);
+
+    String[] someIds(User... users);
+
     /*
      More things to test:
      a Java Bean
