@@ -72,18 +72,19 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.9.1</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>fish.payara.samples.ejb-http-remoting</groupId>
             <artifactId>api</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.eclipse</groupId>
-            <artifactId>yasson</artifactId>
-            <version>1.0.4.payara-p1-SNAPSHOT</version>
-            <scope>runtime</scope>
-        </dependency>
     </dependencies>
 
     <!-- This will use cargo for testing to keep all the dependencies away from the test classpath -->
