@@ -8,19 +8,40 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.Jdk14Logger;
+import static java.math.BigInteger.ONE;
+import static java.time.Instant.now;
+import static java.time.temporal.ChronoUnit.DAYS;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Date;
+import static java.util.logging.Level.FINEST;
 import java.util.logging.Logger;
+
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.omnifaces.utils.security.Certificates;
 
 /**
  * Various high level Java EE 7 samples specific operations to execute against
@@ -446,6 +467,65 @@ public class ServerOperations {
         // TODO: support other servers than Payara and GlassFish
         
         // WildFly ./bin/add-user.sh -a -u u1 -p p1 -g g1
+    }
+
+    public static X509Certificate createSelfSignedCertificate(KeyPair keys) {
+        try {
+            Provider provider = new BouncyCastleProvider();
+            Security.addProvider(provider);
+            return new JcaX509CertificateConverter()
+                    .setProvider(provider)
+                    .getCertificate(
+                            new X509v3CertificateBuilder(
+                                    new X500Name("CN=lfoo, OU=bar, O=kaz, L=zak, ST=lak, C=UK"),
+                                    ONE,
+                                    Date.from(now()),
+                                    Date.from(now().plus(1, DAYS)),
+                                    new X500Name("CN=lfoo, OU=bar, O=kaz, L=zak, ST=lak, C=UK"),
+                                    SubjectPublicKeyInfo.getInstance(keys.getPublic().getEncoded()))
+                                    .build(
+                                            new JcaContentSignerBuilder("SHA256WithRSA")
+                                                    .setProvider(provider)
+                                                    .build(keys.getPrivate())));
+        } catch (CertificateException | OperatorCreationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static URL getHostFromCertificate(X509Certificate[] serverCertificateChain, URL existingURL) {
+        try {
+            URL httpsUrl = new URL(
+                    existingURL.getProtocol(),
+                    Certificates.getHostFromCertificate(serverCertificateChain),
+                    existingURL.getPort(),
+                    existingURL.getFile()
+            );
+
+            System.out.println("Changing base URL from " + existingURL + " into " + httpsUrl + "\n");
+
+            return httpsUrl;
+
+        } catch (MalformedURLException e) {
+            System.out.println("Failure creating HTTPS URL");
+            e.printStackTrace();
+
+            System.out.println("FAILED to get CN. Using existing URL: " + existingURL);
+
+            return existingURL;
+        }
+    }
+
+    public static void enableSSLDebug() {
+        System.setProperty("javax.net.debug", "ssl:handshake");
+
+        System.getProperties().put("org.apache.commons.logging.simplelog.defaultlog", "debug");
+        Logger.getLogger("com.gargoylesoftware.htmlunit.httpclient.HtmlUnitSSLConnectionSocketFactory").setLevel(FINEST);
+        Logger.getLogger("org.apache.http.conn.ssl.SSLConnectionSocketFactory").setLevel(FINEST);
+        Log logger = LogFactory.getLog(org.apache.http.conn.ssl.SSLConnectionSocketFactory.class);
+        ((Jdk14Logger) logger).getLogger().setLevel(FINEST);
+        logger = LogFactory.getLog(com.gargoylesoftware.htmlunit.httpclient.HtmlUnitSSLConnectionSocketFactory.class);
+        ((Jdk14Logger) logger).getLogger().setLevel(FINEST);
+        Logger.getGlobal().getParent().getHandlers()[0].setLevel(FINEST);
     }
 }
 
