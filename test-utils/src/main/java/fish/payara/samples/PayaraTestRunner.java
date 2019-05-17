@@ -79,7 +79,7 @@ public class PayaraTestRunner extends BlockJUnit4ClassRunner {
                 PayaraVersion payaraVersionUnderTesting = PayaraVersion.fromString(System.getProperty(PAYARA_VERSION));
 
                 if (payaraVersionUnderTesting.ordinal() < sincePayara.value().ordinal()) {
-                    this.skipEntireClass = true;
+                    skipEntireClass = true;
                 }
 
             } catch (IllegalArgumentException exception) {
@@ -98,10 +98,7 @@ public class PayaraTestRunner extends BlockJUnit4ClassRunner {
             return result;
         }
         
-        Iterator<FrameworkMethod> testMethods = super.computeTestMethods().iterator();
-
-        while (testMethods.hasNext()) {
-            FrameworkMethod testMethod = testMethods.next();
+        for(FrameworkMethod testMethod : super.computeTestMethods()) {
             
             //if the annotation is there and the version exists then we'll eval whether to test. else the method will always test
             if (testMethod.getAnnotation(SincePayara.class) != null && System.getProperty(PAYARA_VERSION) != null) {
@@ -116,7 +113,7 @@ public class PayaraTestRunner extends BlockJUnit4ClassRunner {
                         System.out.println("Not running test " + testMethod.getName() 
                                 + "due to the version of payara being tested ("
                                 + serverVersion.name() + ") being earlier than that marked on the @SincePayara "
-                                +sincePayara.value()+" annotation on the test method");
+                                + sincePayara.value()+" annotation on the test method");
                     }
                 } catch (IllegalArgumentException exception) {
                     // no match so test anyway
@@ -130,9 +127,11 @@ public class PayaraTestRunner extends BlockJUnit4ClassRunner {
         return result;
     }
     
-    //overridden to remove warning of no valid methods if none are applicable
+    /**
+     * Overrides parent to remove warning of no valid methods if none are applicable
+     * @param errors 
+     */
     @Override
-    @SuppressWarnings({"deprecation"})
     protected void validateInstanceMethods(List<Throwable> errors) {
         validatePublicVoidNoArgMethods(After.class, false, errors);
         validatePublicVoidNoArgMethods(Before.class, false, errors);
