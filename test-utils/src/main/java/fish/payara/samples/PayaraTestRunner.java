@@ -40,7 +40,6 @@
 package fish.payara.samples;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -50,7 +49,7 @@ import org.junit.runners.model.InitializationError;
 
 /**
  * An extension of the BlockJUnit4ClassRunner. To be used when <code>@SincePayara</code> is used.
- * Decides based on the annotations of  <code>@SincePayara</code> which tests should be run
+ * Decides based on the annotations of <code>@SincePayara</code> which tests should be run
  * 
  * See also PayaraArquillianTestRunner which is a copy of this class for Arquillian test cases
  * 

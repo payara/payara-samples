@@ -40,7 +40,6 @@
 package fish.payara.samples;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -51,7 +50,7 @@ import org.jboss.arquillian.junit.Arquillian;
 /**
  * An extension of the Arquillian Test Runner. 
  * To be used when <code>@SincePayara</code> is used in Payara Classes run with Arquillian.
- * Decides based on the annotations of  <code>@SincePayara</code> which tests should be run
+ * Decides based on the annotations of <code>@SincePayara</code> which tests should be run
  * 
  * See also PayaraTestRunner which is a copy of this class for plain JUnit test cases
  * 
