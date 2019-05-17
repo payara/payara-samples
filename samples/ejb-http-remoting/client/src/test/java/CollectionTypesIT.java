@@ -54,6 +54,9 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 
+/**
+ * Test collections as arguments and return types
+ */
 public class CollectionTypesIT {
     static RemoteService remoteService;
 

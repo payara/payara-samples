@@ -50,7 +50,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
-public class CrateTypesIT {
+/**
+ * Test return values and arguments involving JSON objects mapped to Pojos
+ */
+public class RecordTypesIT {
     static RemoteService remoteService;
 
     @BeforeClass

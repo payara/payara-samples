@@ -48,6 +48,9 @@ import javax.naming.NamingException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Test using various lookup strings for obtaiing the proxy
+ */
 public class LookupIT {
     @Test
     public void ejbByInterfaceName() throws NamingException {
