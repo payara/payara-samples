@@ -110,6 +110,7 @@
     <modules>
         <module>samples</module>
         <module>test-utils</module>
+        <module>classpath</module>
     </modules>
 
     <dependencyManagement>
