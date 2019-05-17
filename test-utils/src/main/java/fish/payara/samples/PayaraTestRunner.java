@@ -48,8 +48,8 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
 /**
- * An extension of the BlockJUnit4ClassRunner. To be used when <code>@SincePayara</code> is used.
- * Decides based on the annotations of <code>@SincePayara</code> which tests should be run
+ * An extension of the BlockJUnit4ClassRunner. To be used when {@link fish.payara.samples.SincePayara @SincePayara} is used.
+ * Decides based on the annotations of {@link fish.payara.samples.SincePayara @SincePayara} which tests should be run
  * 
  * See also PayaraArquillianTestRunner which is a copy of this class for Arquillian test cases
  * 

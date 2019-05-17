@@ -49,8 +49,8 @@ import org.jboss.arquillian.junit.Arquillian;
 
 /**
  * An extension of the Arquillian Test Runner. 
- * To be used when <code>@SincePayara</code> is used in Payara Classes run with Arquillian.
- * Decides based on the annotations of <code>@SincePayara</code> which tests should be run
+ * To be used when {@link fish.payara.samples.SincePayara @SincePayara} is used in Payara Classes run with Arquillian.
+ * Decides based on the annotations of {@link fish.payara.samples.SincePayara @SincePayara} which tests should be run
  * 
  * See also PayaraTestRunner which is a copy of this class for plain JUnit test cases
  * 
