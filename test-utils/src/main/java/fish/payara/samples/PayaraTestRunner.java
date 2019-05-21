@@ -47,6 +47,8 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
+import static fish.payara.samples.PayaraVersion.isPayaraSystemPropertyVersionExcludedFromTestPriorTo;
+
 /**
  * An extension of the BlockJUnit4ClassRunner. To be used when {@link fish.payara.samples.SincePayara @SincePayara} is used.
  * Decides based on the annotations of {@link fish.payara.samples.SincePayara @SincePayara} which tests should be run
@@ -66,24 +68,9 @@ public class PayaraTestRunner extends BlockJUnit4ClassRunner {
     public PayaraTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
         
-        if (klass.getAnnotation(SincePayara.class) == null) {
-            return;
-        }
-        SincePayara sincePayara = klass.getAnnotation(SincePayara.class);
-
-        if (System.getProperty(PAYARA_VERSION) != null) {
-
-            try {
-
-                PayaraVersion payaraVersionUnderTesting = PayaraVersion.fromString(System.getProperty(PAYARA_VERSION));
-
-                if (payaraVersionUnderTesting.ordinal() < sincePayara.value().ordinal()) {
-                    skipEntireClass = true;
-                }
-
-            } catch (IllegalArgumentException exception) {
-                //no match, so still run tests
-            }
+        if (klass.getAnnotation(SincePayara.class) != null) {
+            SincePayara sincePayara = klass.getAnnotation(SincePayara.class);
+            skipEntireClass = isPayaraSystemPropertyVersionExcludedFromTestPriorTo(sincePayara.value());
         }
 
     }
@@ -99,30 +86,15 @@ public class PayaraTestRunner extends BlockJUnit4ClassRunner {
         
         for(FrameworkMethod testMethod : super.computeTestMethods()) {
             
-            //if the annotation is there and the version exists then we'll eval whether to test. else the method will always test
-            if (testMethod.getAnnotation(SincePayara.class) != null && System.getProperty(PAYARA_VERSION) != null) {
-                
-                try {
-                    PayaraVersion serverVersion = PayaraVersion.fromString(System.getProperty(PAYARA_VERSION));
-
-                    SincePayara sincePayara = testMethod.getAnnotation(SincePayara.class);
-                    if (serverVersion.ordinal() >= sincePayara.value().ordinal()) {
-                        result.add(testMethod);
-                    }else{
-                        System.out.println("Not running test " + testMethod.getName() 
-                                + "due to the version of payara being tested ("
-                                + serverVersion.name() + ") being earlier than that marked on the @SincePayara "
-                                + sincePayara.value()+" annotation on the test method");
-                    }
-                } catch (IllegalArgumentException exception) {
-                    // no match so test anyway
-                    result.add(testMethod);
-                }
-                
+            if (testMethod.getAnnotation(SincePayara.class) != null 
+                    && isPayaraSystemPropertyVersionExcludedFromTestPriorTo(testMethod.getAnnotation(SincePayara.class).value())) {
+                //don't add to test list
             } else {
                 result.add(testMethod);
             }
+            
         }
+        
         return result;
     }
     

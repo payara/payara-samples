@@ -41,7 +41,8 @@ package fish.payara.samples;
 
 /**
  * Enum representing the versions of Payara. It does not represent all versions because it only needs to include those
- * used in the <code>@SincePayara</code> annotation
+ * used in the <code>@SincePayara</code> annotation.
+ * This class also contains methods to determine against the system property, whether the version should be tested.
  * @author Mark Wareham
  */
 public enum PayaraVersion {
@@ -63,6 +64,7 @@ public enum PayaraVersion {
     
     
     private final String version;    
+    private static final String PAYARA_VERSION_PROPERTY_NAME = "payara.version";
 
     private PayaraVersion (String version) {
         this.version = version;
@@ -85,6 +87,41 @@ public enum PayaraVersion {
         }
         System.err.println("fish.payara.samples.PayaraVersion.fromString(). No known payara version of " + plainVersion);
         throw new IllegalArgumentException("No PayaraVersion of '"+plainVersion+"' listed in enum");
+    }
+    
+    /**
+     * Determines if the current version being tested (based on system property) is excluded for the given version
+     * @param since what version of Payara testing is applicable since
+     * @return whether to exclude from being tested
+     */
+    public static boolean isPayaraSystemPropertyVersionExcludedFromTestPriorTo(PayaraVersion since){
+        
+        if (System.getProperty(PAYARA_VERSION_PROPERTY_NAME) != null) {
+
+            try {
+
+                PayaraVersion systemPropertyVersion = fromString(System.getProperty(PAYARA_VERSION_PROPERTY_NAME));
+                return systemPropertyVersion.isExcludedFromTestPriorTo(since);
+
+            } catch (IllegalArgumentException exception) {
+                //no match for system property version, so can't say to exclude
+            }
+        }
+        return false;
+    }
+    
+    public boolean isExcludedFromTestPriorTo(PayaraVersion since){
+
+        if (since != null) {
+
+            if (this.ordinal() < since.ordinal()) {
+                return true;
+            }
+            
+        }
+
+        return false;
+
     }
 
 }
