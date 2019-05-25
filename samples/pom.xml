@@ -21,6 +21,7 @@
         <module>oauth2</module>
         <module>openid</module>
         <module>asadmin</module>
+        <module>microprofile-endpoints</module>
     </modules>
 
     <dependencies>
