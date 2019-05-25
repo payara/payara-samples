@@ -43,9 +43,7 @@ import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import java.net.URL;
-
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -62,8 +60,6 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import fish.payara.samples.CliCommands;
 import fish.payara.samples.ServerOperations;
 import static java.util.Arrays.asList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -93,8 +89,6 @@ public class MicroprofileSecureEndpointTest {
         CliCommands.payaraGlassFish(asList("set-microprofile-healthcheck-configuration", "--securityenabled", "true"));
         CliCommands.payaraGlassFish(asList("set-openapi-configuration", "--securityenabled", "true"));
         ServerOperations.restartContainer();
-        
-        
     }
 
     @AfterClass
