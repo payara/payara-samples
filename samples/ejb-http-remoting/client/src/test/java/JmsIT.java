@@ -38,33 +38,55 @@
  *    holder.
  */
 
-package fish.payara.samples.ejbhttp.client;
+import fish.payara.samples.ejbhttp.client.JmsClientExample;
+import org.junit.Test;
 
+import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import java.util.Hashtable;
+import javax.rmi.PortableRemoteObject;
+import java.lang.IllegalStateException;
 
-import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
-import static javax.naming.Context.PROVIDER_URL;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public enum RemoteConnector {
-    INSTANCE;
+public class JmsIT {
+    @Test
+    public void sendAndReceiveMessage() throws NamingException, JMSException {
+        final String connectionFactoryName = "jms/ConnectionFactory";
+        InitialContext jndi = JmsClientExample.INSTANCE.getContext();
 
-    private final InitialContext ejbRemoteContext;
+        // some real world JMS over remote JNDI code...
 
-    RemoteConnector() {
-        Hashtable<String, String> environment = new Hashtable<String, String>();
-        environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
-        environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
+        final Object lObject = jndi.lookup(connectionFactoryName);
+        QueueConnectionFactory queueConnectionFactory = (QueueConnectionFactory) PortableRemoteObject.narrow(lObject, QueueConnectionFactory.class);
 
-        try {
-            ejbRemoteContext = new InitialContext(environment);
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
+
+        if (queueConnectionFactory == null) {
+            throw new IllegalStateException("The JNDI Queue Conection Factory " + connectionFactoryName + " lookup failed.");
         }
-    }
 
-    public <T> T lookup(String jndiName) throws NamingException {
-        return (T) ejbRemoteContext.lookup(jndiName);
+        QueueConnection queueConnection = queueConnectionFactory.createQueueConnection();
+        queueConnection.start();
+        QueueSession queueSession = queueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+
+        // sending
+        String pJNDIQueueName = "queue/test.queue";
+        Queue queue = (Queue) PortableRemoteObject.narrow(jndi.lookup(pJNDIQueueName), Queue.class);
+        QueueSender queueSender = queueSession.createSender(queue);
+
+        queueSender.send(queueSession.createTextMessage("It works"));
+
+        // receiving
+        QueueReceiver queueReceiver = queueSession.createReceiver(queue);
+
+        Message m = queueReceiver.receive(1000);
+
+        assertThat(m).isNotNull().isInstanceOf(TextMessage.class);
+
+        TextMessage tm = (TextMessage) m;
+        assertThat(tm.getText()).isEqualTo("It works");
+
+        queueConnection.stop();
+        queueConnection.close();
     }
 }

@@ -84,6 +84,11 @@
             <artifactId>api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.mq</groupId>
+            <artifactId>imq</artifactId><!-- mq-client hasn't been released by EE4J-->
+            <version>5.1</version>
+        </dependency>
 
     </dependencies>
 

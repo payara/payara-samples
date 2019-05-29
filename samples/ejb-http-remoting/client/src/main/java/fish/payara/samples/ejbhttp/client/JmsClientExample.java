@@ -40,31 +40,68 @@
 
 package fish.payara.samples.ejbhttp.client;
 
+import com.sun.messaging.BasicQueue;
+import com.sun.messaging.ConnectionConfiguration;
+import com.sun.messaging.ConnectionFactory;
+import com.sun.messaging.QueueConnectionFactory;
+import fish.payara.ejb.http.client.RemoteEJBContextFactory;
+import fish.payara.ejb.http.client.adapter.ClientAdapter;
+import fish.payara.ejb.http.client.adapter.ClientAdapterCustomizer;
+import fish.payara.ejb.http.client.adapter.CompositeClientAdapter;
+
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Queue;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.util.Hashtable;
+import java.util.Optional;
 
+import static fish.payara.ejb.http.client.adapter.ClientAdapterCustomizer.customize;
 import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
 import static javax.naming.Context.PROVIDER_URL;
 
-public enum RemoteConnector {
+public enum JmsClientExample {
     INSTANCE;
 
-    private final InitialContext ejbRemoteContext;
+    private final InitialContext context;
 
-    RemoteConnector() {
-        Hashtable<String, String> environment = new Hashtable<String, String>();
+    JmsClientExample() {
+        Hashtable<String, Object> environment = new Hashtable<>();
         environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
         environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
 
+        QueueConnectionFactory jmsConnectionFactory = new QueueConnectionFactory();
         try {
-            ejbRemoteContext = new InitialContext(environment);
+            jmsConnectionFactory.setProperty(ConnectionConfiguration.imqAddressList,
+                    "localhost:7676");
+            CompositeClientAdapter adapter = CompositeClientAdapter.newBuilder().register(
+                    customize((name, ctx) -> Optional.of(jmsConnectionFactory)).matchPrefix("jms/ConnectionFactory"),
+                    customize(this::queueAdapter).matchPrefix("queue/")
+                    ).build();
+            environment.put(RemoteEJBContextFactory.CLIENT_ADAPTER, adapter);
+            this.context = new InitialContext(environment);
+        } catch (JMSException e) {
+            throw new IllegalStateException("Cannot connect to JMS", e);
         } catch (NamingException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Cannot construct naming context", e);
+        }
+
+    }
+
+    private Optional<Object> queueAdapter(String name, Context remoteContext) throws NamingException {
+        try {
+            // that's the internal queue implementation that OpenMQ uses.
+            return Optional.of(new BasicQueue(name));
+        } catch (JMSException e) {
+            NamingException namingException = new NamingException("Invalid queue name: " + name);
+            namingException.setRootCause(namingException);
+            throw namingException;
         }
     }
 
-    public <T> T lookup(String jndiName) throws NamingException {
-        return (T) ejbRemoteContext.lookup(jndiName);
+    public InitialContext getContext() {
+        return context;
     }
 }
