@@ -42,16 +42,11 @@ package fish.payara.samples.ejbhttp.client;
 
 import com.sun.messaging.BasicQueue;
 import com.sun.messaging.ConnectionConfiguration;
-import com.sun.messaging.ConnectionFactory;
 import com.sun.messaging.QueueConnectionFactory;
 import fish.payara.ejb.http.client.RemoteEJBContextFactory;
-import fish.payara.ejb.http.client.adapter.ClientAdapter;
-import fish.payara.ejb.http.client.adapter.ClientAdapterCustomizer;
 import fish.payara.ejb.http.client.adapter.CompositeClientAdapter;
 
-import javax.jms.Connection;
 import javax.jms.JMSException;
-import javax.jms.Queue;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -72,14 +67,20 @@ public enum JmsClientExample {
         environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
         environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
 
-        QueueConnectionFactory jmsConnectionFactory = new QueueConnectionFactory();
         try {
-            jmsConnectionFactory.setProperty(ConnectionConfiguration.imqAddressList,
-                    "localhost:7676");
+            // Prepare Client locally
+            QueueConnectionFactory jmsConnectionFactory = new QueueConnectionFactory();
+            jmsConnectionFactory.setProperty(ConnectionConfiguration.imqAddressList, "localhost:7676");
+
             CompositeClientAdapter adapter = CompositeClientAdapter.newBuilder().register(
-                    customize((name, ctx) -> Optional.of(jmsConnectionFactory)).matchPrefix("jms/ConnectionFactory"),
-                    customize(this::queueAdapter).matchPrefix("queue/")
-                    ).build();
+                (name, ctx) ->
+                        "jms/ConnectionFactory".equals(name)
+                                ? Optional.of(jmsConnectionFactory)
+                                : Optional.empty(),
+
+                customize(this::queueAdapter).matchPrefix("queue/")
+            ).build();
+
             environment.put(RemoteEJBContextFactory.CLIENT_ADAPTER, adapter);
             this.context = new InitialContext(environment);
         } catch (JMSException e) {
