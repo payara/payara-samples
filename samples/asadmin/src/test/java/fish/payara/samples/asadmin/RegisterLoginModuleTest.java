@@ -116,25 +116,6 @@ public class RegisterLoginModuleTest extends AsadminTest {
         System.out.println(result.getOutput());
         assertSuccess(result);
     }
-    
-//    @After
-//    public void cleanupJAASContext() throws IOException {
-//    
-//        String originalFileContents = loginConf();
-//        
-//        if(originalFileContents.contains("test1 {")) {
-//            String newFileContents = originalFileContents.replaceFirst("test1 { .* };", "");
-//            try {
-//                BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")));
-//                writer.write(newFileContents);
-//                writer.close();
-//            } catch(IOException e) {
-//                System.out.print(e.getMessage());
-//                e.printStackTrace();
-//            }
-//        }
-//        
-//    }
 
     private String loginConf() throws IOException {
         File loginConf = new File(System.getProperty("java.security.auth.login.config"));
