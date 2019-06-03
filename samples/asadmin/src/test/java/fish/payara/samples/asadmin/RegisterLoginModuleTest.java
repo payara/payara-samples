@@ -70,19 +70,17 @@ public class RegisterLoginModuleTest extends AsadminTest {
         result = asadmin("delete-auth-realm", "test1");
         System.out.println(result.getOutput());
         assertSuccess(result);
-        
-        if (contents.contains("test1 {")) {
-            String newFileContents = contents.replace(contents.substring(contents.indexOf("test1")), "");
-            System.out.print(newFileContents);
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")));
-                writer.write(newFileContents);
-                writer.close();
-            } catch(IOException e) {
-                System.out.print(e.getMessage());
-                e.printStackTrace();
-            }
-        }
+       
+        String newFileContents = contents.replace(contents.substring(contents.indexOf("test1")), "");
+        System.out.print(newFileContents);
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")));
+            writer.write(newFileContents);
+            writer.close();
+        } catch(IOException e) {
+            System.out.print(e.getMessage());
+            e.printStackTrace();
+        }     
         
         assertFalse(loginConf().contains("test1 {"));
     }
