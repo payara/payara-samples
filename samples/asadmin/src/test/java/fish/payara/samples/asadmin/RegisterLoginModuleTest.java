@@ -41,13 +41,17 @@
 package fish.payara.samples.asadmin;
 
 import com.google.common.io.CharStreams;
+import java.io.BufferedWriter;
 import org.glassfish.embeddable.CommandResult;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.regex.Pattern;
+import org.junit.After;
 import static org.junit.Assert.assertEquals;
 
 public class RegisterLoginModuleTest extends AsadminTest {
@@ -66,6 +70,21 @@ public class RegisterLoginModuleTest extends AsadminTest {
         result = asadmin("delete-auth-realm", "test1");
         System.out.println(result.getOutput());
         assertSuccess(result);
+        
+        if (contents.contains("test1 {")) {
+            String newFileContents = contents.replace(contents.substring(contents.indexOf("test1")), "");
+            System.out.print(newFileContents);
+            try {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")));
+                writer.write(newFileContents);
+                writer.close();
+            } catch(IOException e) {
+                System.out.print(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        
+        assertFalse(loginConf().contains("test1 {"));
     }
 
     @Test
@@ -97,6 +116,25 @@ public class RegisterLoginModuleTest extends AsadminTest {
         System.out.println(result.getOutput());
         assertSuccess(result);
     }
+    
+//    @After
+//    public void cleanupJAASContext() throws IOException {
+//    
+//        String originalFileContents = loginConf();
+//        
+//        if(originalFileContents.contains("test1 {")) {
+//            String newFileContents = originalFileContents.replaceFirst("test1 { .* };", "");
+//            try {
+//                BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")));
+//                writer.write(newFileContents);
+//                writer.close();
+//            } catch(IOException e) {
+//                System.out.print(e.getMessage());
+//                e.printStackTrace();
+//            }
+//        }
+//        
+//    }
 
     private String loginConf() throws IOException {
         File loginConf = new File(System.getProperty("java.security.auth.login.config"));
