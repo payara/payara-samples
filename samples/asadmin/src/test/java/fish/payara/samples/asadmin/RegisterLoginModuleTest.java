@@ -41,13 +41,17 @@
 package fish.payara.samples.asadmin;
 
 import com.google.common.io.CharStreams;
+import java.io.BufferedWriter;
 import org.glassfish.embeddable.CommandResult;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.regex.Pattern;
+import org.junit.After;
 import static org.junit.Assert.assertEquals;
 
 public class RegisterLoginModuleTest extends AsadminTest {
@@ -62,6 +66,25 @@ public class RegisterLoginModuleTest extends AsadminTest {
         assertSuccess(result);
         String contents = loginConf();
         assertContains("test1 {", contents);
+        
+        result = asadmin("delete-auth-realm", "test1");
+        System.out.println(result.getOutput());
+        assertSuccess(result);
+       
+        //Removes JAAS context test1 from the login.conf file on the domain
+        //It's expected that this will be the last entry in the login.conf file
+        //and so we just grab everything up to this final entry as the new file
+        //contents
+        String newFileContents = contents.substring(0, contents.indexOf("test1"));
+        System.out.print(newFileContents);
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")))) {        
+            writer.write(newFileContents);
+        } catch(IOException e) {
+            System.out.print(e.getMessage());
+            e.printStackTrace();
+        }     
+        
+        assertFalse(loginConf().contains("test1 {"));
     }
 
     @Test
@@ -73,6 +96,10 @@ public class RegisterLoginModuleTest extends AsadminTest {
         System.out.println(result.getOutput());
         assertEquals(CommandResult.ExitStatus.WARNING, result.getExitStatus());
         assertContains("fileRealm is already configured", result.getOutput());
+        
+        result = asadmin("delete-auth-realm", "test2");
+        System.out.println(result.getOutput());
+        assertSuccess(result);
     }
 
     @Test
@@ -84,6 +111,10 @@ public class RegisterLoginModuleTest extends AsadminTest {
         System.out.println(result.getOutput());
         assertEquals(CommandResult.ExitStatus.WARNING, result.getExitStatus());
         assertContains("No JAAS context is defined", result.getOutput());
+        
+        result = asadmin("delete-auth-realm", "test3");
+        System.out.println(result.getOutput());
+        assertSuccess(result);
     }
 
     private String loginConf() throws IOException {
