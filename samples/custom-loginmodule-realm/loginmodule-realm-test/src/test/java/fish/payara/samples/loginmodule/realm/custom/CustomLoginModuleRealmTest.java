@@ -58,6 +58,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
@@ -72,6 +73,7 @@ import fish.payara.samples.loginmodule.realm.custom.CustomRealm;
 import fish.payara.samples.loginmodule.realm.custom.TestServlet;
 
 @RunWith(Arquillian.class)
+@Ignore("Untrustworthy")
 public class CustomLoginModuleRealmTest {
 
     private static final String WEBAPP_SOURCE = "src/main/webapp";
@@ -83,35 +85,35 @@ public class CustomLoginModuleRealmTest {
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
-        
+
         addMavenJarsToContainerLibFolder("pom.xml", "fish.payara.samples:loginmodule-realm-impl");
         ServerOperations.restartContainer();
-        
+
         List<String> cmd = new ArrayList<>();
-        
+
         cmd.add("delete-auth-realm");
         cmd.add("custom");
         CliCommands.payaraGlassFish(cmd);
-        
+
         cmd.clear();
 
         cmd.add("create-auth-realm");
-        
+
         cmd.add("--login-module");
         cmd.add(CustomLoginModule.class.getName());
-        
+
         cmd.add("--classname");
         cmd.add(CustomRealm.class.getName());
-        
+
         cmd.add("--property");
         cmd.add("jaas-context=customRealm");
-        
+
         cmd.add("custom");
-        
+
         CliCommands.payaraGlassFish(cmd);
-        
+
         ServerOperations.restartContainer();
-        
+
         return ShrinkWrap.create(WebArchive.class)
                 .addClass(TestServlet.class)
                 .addAsWebInfResource(new File(WEBAPP_SOURCE, "WEB-INF/web.xml"))
@@ -126,19 +128,19 @@ public class CustomLoginModuleRealmTest {
     @Test
     @RunAsClient
     public void testAuthenticationWithCorrectUser() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-        
+
         System.out.println("\n\nRequesting: " + (base + "testServlet"));
-        
+
         DefaultCredentialsProvider credentialsProvider = new DefaultCredentialsProvider();
         credentialsProvider.addCredentials("realmUser", "realmPassword");
-        
+
         webClient.setCredentialsProvider(credentialsProvider);
         TextPage page = webClient.getPage(base + "testServlet");
-        
+
         System.out.println(page.getContent());
-        
+
         assertTrue("my GET", page.getContent().contains("This is a test servlet"));
-        
+
         assertTrue("User doesn't have the corrrect role", page.getContent().contains("web user has role \"realmGroup\": true"));
     }
 
