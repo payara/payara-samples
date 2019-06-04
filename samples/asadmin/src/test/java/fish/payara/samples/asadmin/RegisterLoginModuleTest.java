@@ -71,7 +71,11 @@ public class RegisterLoginModuleTest extends AsadminTest {
         System.out.println(result.getOutput());
         assertSuccess(result);
        
-        String newFileContents = contents.replace(contents.substring(contents.indexOf("test1")), "");
+        //Removes JAAS context test1 from the login.conf file on the domain
+        //It's expected that this will be the last entry in the login.conf file
+        //and so we just grab everything up to this final entry as the new file
+        //contents
+        String newFileContents = contents.substring(0, contents.indexOf("test1"));
         System.out.print(newFileContents);
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")))) {        
             writer.write(newFileContents);
