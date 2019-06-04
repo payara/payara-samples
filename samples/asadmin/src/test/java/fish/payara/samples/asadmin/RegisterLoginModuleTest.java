@@ -73,10 +73,8 @@ public class RegisterLoginModuleTest extends AsadminTest {
        
         String newFileContents = contents.replace(contents.substring(contents.indexOf("test1")), "");
         System.out.print(newFileContents);
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")));
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(System.getProperty("java.security.auth.login.config")))) {        
             writer.write(newFileContents);
-            writer.close();
         } catch(IOException e) {
             System.out.print(e.getMessage());
             e.printStackTrace();
