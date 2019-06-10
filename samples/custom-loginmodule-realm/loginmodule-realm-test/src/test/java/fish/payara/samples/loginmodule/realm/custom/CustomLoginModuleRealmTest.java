@@ -67,9 +67,6 @@ import com.gargoylesoftware.htmlunit.WebClient;
 
 import fish.payara.samples.CliCommands;
 import fish.payara.samples.ServerOperations;
-import fish.payara.samples.loginmodule.realm.custom.CustomLoginModule;
-import fish.payara.samples.loginmodule.realm.custom.CustomRealm;
-import fish.payara.samples.loginmodule.realm.custom.TestServlet;
 
 @RunWith(Arquillian.class)
 public class CustomLoginModuleRealmTest {
