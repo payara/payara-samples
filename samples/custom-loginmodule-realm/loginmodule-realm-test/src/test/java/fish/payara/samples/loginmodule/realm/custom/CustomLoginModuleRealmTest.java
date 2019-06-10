@@ -66,7 +66,7 @@ import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 
 import fish.payara.samples.CliCommands;
-import fish.payara.samples.ServerOperations;
+import static fish.payara.samples.ServerOperations.*;
 
 @RunWith(Arquillian.class)
 public class CustomLoginModuleRealmTest {
@@ -82,7 +82,7 @@ public class CustomLoginModuleRealmTest {
     public static WebArchive createDeployment() {
 
         addMavenJarsToContainerLibFolder("pom.xml", "fish.payara.samples:loginmodule-realm-impl");
-        ServerOperations.restartContainer();
+        restartContainer(getPayaraDomainFromServer());
 
         List<String> cmd = new ArrayList<>();
 
@@ -107,7 +107,7 @@ public class CustomLoginModuleRealmTest {
 
         CliCommands.payaraGlassFish(cmd);
 
-        ServerOperations.restartContainer();
+        restartContainer(getPayaraDomainFromServer());
 
         return ShrinkWrap.create(WebArchive.class)
                 .addClass(TestServlet.class)
