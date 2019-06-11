@@ -293,7 +293,7 @@ public class ServerOperations {
         return null;
     }
     
-    private static String getPayaraDomainFromServer() {
+    public static String getPayaraDomainFromServer() {
         System.out.println("Getting Payara domaain from server");
         
         List<String> output = new ArrayList<>();

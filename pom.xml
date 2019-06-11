@@ -28,7 +28,7 @@
 
         <!-- Micro implementation versions (these are downloaded and installed
             in these versions by Maven for the CI profiles) -->
-        <payara.version>5.192-SNAPSHOT</payara.version>
+        <payara.version>5.193-SNAPSHOT</payara.version>
         <liberty.version>17.0.0.4</liberty.version>
         <wildfly.version>2018.4.1</wildfly.version>
         <jboss.arquillian.version>1.4.0.Final</jboss.arquillian.version>
