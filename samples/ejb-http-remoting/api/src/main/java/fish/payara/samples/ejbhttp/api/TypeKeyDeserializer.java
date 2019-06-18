@@ -48,9 +48,7 @@ import java.lang.reflect.Type;
 public class TypeKeyDeserializer implements JsonbDeserializer<Stuff.Container> {
     @Override
     public Stuff.Container deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-        if (parser.hasNext()) {
-            // there's more, we're on START_OBJECT
-            parser.next();
+        if (parser.hasNext() && parser.next() == JsonParser.Event.KEY_NAME) {
             String className = parser.getString();
             try {
                 Class<?> valueClass = Class.forName(className);
