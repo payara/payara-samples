@@ -52,7 +52,6 @@ import javax.naming.NamingException;
 import javax.rmi.PortableRemoteObject;
 import java.lang.IllegalStateException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -60,18 +59,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JmsIT {
 
     @Parameters(name = "{0}")
-    public static Iterable<String> clients() {
-        return Arrays.asList(JmsClientExample.values()).stream().map(
-                item -> item.name()).collect(Collectors.toList());
+    public static Iterable<JmsClientExample> clients() {
+        return Arrays.asList(JmsClientExample.values());
     }
 
     @Parameter
-    public String clientName;
+    public JmsClientExample client;
 
     @Test
     public void sendAndReceiveMessage() throws NamingException, JMSException {
         final String connectionFactoryName = "jms/ConnectionFactory";
-        InitialContext jndi = JmsClientExample.valueOf(clientName).getContext();
+        InitialContext jndi = client.getContext();
 
         // some real world JMS over remote JNDI code...
 
