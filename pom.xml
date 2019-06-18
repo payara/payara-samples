@@ -139,6 +139,18 @@
                 <version>1.0.Beta3-m3</version>
                 <scope>test</scope>
             </dependency>
+			<dependency>
+				<groupId>org.eclipse.microprofile.opentracing</groupId>
+				<artifactId>microprofile-opentracing-api</artifactId>
+				<version>1.0</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.opentracing</groupId>
+				<artifactId>opentracing-api</artifactId>
+				<version>0.30.0</version>
+				<scope>provided</scope>
+			</dependency>
         </dependencies>
     </dependencyManagement>
 
