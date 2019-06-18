@@ -41,7 +41,6 @@
 import fish.payara.samples.ejbhttp.api.ExposedService;
 import fish.payara.samples.ejbhttp.api.RemoteService;
 import fish.payara.samples.ejbhttp.api.User;
-import fish.payara.samples.ejbhttp.client.RemoteConnector;
 import org.junit.Test;
 
 import javax.naming.NamingException;
@@ -51,23 +50,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test using various lookup strings for obtaiing the proxy
  */
-public class LookupIT {
+public class LookupIT extends AbstractClientIT {
     @Test
     public void ejbByInterfaceName() throws NamingException {
-        ExposedService bean = RemoteConnector.INSTANCE.lookup(ExposedService.class.getName());
-        assertThat(bean.createSimpleUser()).isInstanceOf(User.class);
+        if (getVersion() == 0) { // plain name no longer supported from v1
+            ExposedService bean = getConnector().lookup(ExposedService.class.getName());
+            assertThat(bean.createSimpleUser()).isInstanceOf(User.class);
+        }
     }
 
     @Test
     public void ejbByBeanName() throws NamingException {
         // Hybrid bean is not available by name as it implements both remote and local interface
-        RemoteService bean = RemoteConnector.INSTANCE.lookup("java:global/server-app/RemoteServiceBean");
+        RemoteService bean = getConnector().lookup("java:global/server-app/RemoteServiceBean");
         assertThat(bean.createSimpleUser()).isInstanceOf(User.class);
     }
 
     @Test
     public void ejbByBeanAndInterfaceName() throws NamingException {
-        ExposedService bean = RemoteConnector.INSTANCE.lookup("java:global/server-app/HybridBean!"+ExposedService.class.getName());
+        ExposedService bean = getConnector().lookup("java:global/server-app/HybridBean!"+ExposedService.class.getName());
         assertThat(bean.createSimpleUser()).isInstanceOf(User.class);
     }
 }

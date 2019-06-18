@@ -38,27 +38,14 @@
  *    holder.
  */
 
-import fish.payara.samples.ejbhttp.api.RemoteService;
-import fish.payara.samples.ejbhttp.client.RemoteConnector;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import javax.naming.NamingException;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
 
 /**
  * Test values and operations involving primitive objects and their collections.
  */
-public class SimpleTypesIT {
-    static RemoteService remoteService;
-
-    @BeforeClass
-    public static void lookup() throws NamingException {
-        remoteService = RemoteConnector.INSTANCE.lookup("java:global/server-app/RemoteServiceBean");
-    }
+public class SimpleTypesIT extends AbstractClientIT {
 
     @Test
     public void testPrimitiveValue() {

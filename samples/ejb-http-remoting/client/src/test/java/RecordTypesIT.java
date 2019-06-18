@@ -38,28 +38,18 @@
  *    holder.
  */
 
-import fish.payara.samples.ejbhttp.api.RemoteService;
-import fish.payara.samples.ejbhttp.api.User;
-import fish.payara.samples.ejbhttp.client.RemoteConnector;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import javax.naming.NamingException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Test;
+
+import fish.payara.samples.ejbhttp.api.User;
+
 /**
  * Test return values and arguments involving JSON objects mapped to Pojos
  */
-public class RecordTypesIT {
-    static RemoteService remoteService;
-
-    @BeforeClass
-    public static void lookup() throws NamingException {
-        remoteService = RemoteConnector.INSTANCE.lookup("java:global/server-app/RemoteServiceBean");
-    }
+public class RecordTypesIT extends AbstractClientIT {
 
     @Test
     public void testSingleRecord() {
@@ -70,13 +60,17 @@ public class RecordTypesIT {
 
     @Test
     public void testEmptyOptional() {
-        assertFalse("Returned empty optional should serialize as such", remoteService.createOptionalUser(true).isPresent());
+        if (!isJavaSerialization()) { // Optional is not Serializable
+            assertFalse("Returned empty optional should serialize as such", remoteService.createOptionalUser(true).isPresent());
+        }
     }
 
     @Test
     public void testPresentOptional() {
-        User user = remoteService.createOptionalUser(false).get();
-        assertEquals("me", user.login);
-        assertNull(user.friends);
+        if (!isJavaSerialization()) { // Optional is not Serializable
+            User user = remoteService.createOptionalUser(false).get();
+            assertEquals("me", user.login);
+            assertNull(user.friends);
+        }
     }
 }

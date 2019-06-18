@@ -42,17 +42,19 @@ package fish.payara.samples.ejbhttp.api;
 
 import javax.json.bind.annotation.JsonbTypeDeserializer;
 import javax.json.bind.annotation.JsonbTypeSerializer;
+
+import java.io.Serializable;
 import java.util.function.Supplier;
 
 /**
  * It is impossible to do top level polymorphism with JSON-B.
  * One needs to create container outside of hierarchy that will host the mapping.
  */
-public interface Stuff {
+public interface Stuff extends Serializable {
 
     @JsonbTypeSerializer(TypeKeySerializer.class)
     @JsonbTypeDeserializer(TypeKeyDeserializer.class)
-    class Container implements Supplier<Stuff> {
+    class Container implements Supplier<Stuff>, Serializable {
         private Stuff instance;
 
         public Container(Stuff instance) {
