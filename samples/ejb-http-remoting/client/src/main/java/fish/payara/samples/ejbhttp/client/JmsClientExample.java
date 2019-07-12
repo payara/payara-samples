@@ -58,15 +58,16 @@ import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
 import static javax.naming.Context.PROVIDER_URL;
 
 public enum JmsClientExample {
-    INSTANCE;
+    JSON_V0(0),
+    JSON_V1(1);
 
     private final InitialContext context;
 
-    JmsClientExample() {
+    JmsClientExample(int version) {
         Hashtable<String, Object> environment = new Hashtable<>();
         environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
         environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
-
+        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_VERSION, version);
         try {
             // Prepare Client locally
             QueueConnectionFactory jmsConnectionFactory = new QueueConnectionFactory();

@@ -38,13 +38,9 @@
  *    holder.
  */
 
-import fish.payara.samples.ejbhttp.api.RemoteService;
 import fish.payara.samples.ejbhttp.api.User;
-import fish.payara.samples.ejbhttp.client.RemoteConnector;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.naming.NamingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,13 +53,7 @@ import static org.junit.Assert.assertNull;
 /**
  * Test collections as arguments and return types
  */
-public class CollectionTypesIT {
-    static RemoteService remoteService;
-
-    @BeforeClass
-    public static void lookup() throws NamingException {
-        remoteService = RemoteConnector.INSTANCE.lookup("java:global/server-app/RemoteServiceBean");
-    }
+public class CollectionTypesIT extends AbstractClientIT {
 
     @Test
     public void testElementaryListReturnNull() {

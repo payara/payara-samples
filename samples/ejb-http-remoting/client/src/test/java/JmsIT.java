@@ -39,21 +39,37 @@
  */
 
 import fish.payara.samples.ejbhttp.client.JmsClientExample;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 import javax.jms.*;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.rmi.PortableRemoteObject;
 import java.lang.IllegalStateException;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(Parameterized.class)
 public class JmsIT {
+
+    @Parameters(name = "{0}")
+    public static Iterable<JmsClientExample> clients() {
+        return Arrays.asList(JmsClientExample.values());
+    }
+
+    @Parameter
+    public JmsClientExample client;
+
     @Test
     public void sendAndReceiveMessage() throws NamingException, JMSException {
         final String connectionFactoryName = "jms/ConnectionFactory";
-        InitialContext jndi = JmsClientExample.INSTANCE.getContext();
+        InitialContext jndi = client.getContext();
 
         // some real world JMS over remote JNDI code...
 

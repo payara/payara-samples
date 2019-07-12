@@ -42,21 +42,32 @@ package fish.payara.samples.ejbhttp.client;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
+import fish.payara.ejb.http.client.RemoteEJBContextFactory;
+import fish.payara.ejb.http.protocol.SerializationType;
+
 import java.util.Hashtable;
 
 import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
 import static javax.naming.Context.PROVIDER_URL;
 
 public enum RemoteConnector {
-    INSTANCE;
+    JSON_V0(SerializationType.JSON, 0),
+    JSON_V1(SerializationType.JSON, 1),
+    JAVA_V1(SerializationType.JAVA, 1);
 
     private final InitialContext ejbRemoteContext;
+    private final SerializationType type;
+    private final int version;
 
-    RemoteConnector() {
-        Hashtable<String, String> environment = new Hashtable<String, String>();
+    RemoteConnector(SerializationType type, int version) {
+        this.type = type;
+        this.version = version;
+        Hashtable<String, String> environment = new Hashtable<>();
         environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
         environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
-
+        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_SERIALIZATION, type.toString());
+        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_VERSION, String.valueOf(version));
         try {
             ejbRemoteContext = new InitialContext(environment);
         } catch (NamingException e) {
@@ -64,7 +75,16 @@ public enum RemoteConnector {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T lookup(String jndiName) throws NamingException {
         return (T) ejbRemoteContext.lookup(jndiName);
+    }
+
+    public SerializationType getSerializationType() {
+        return type;
+    }
+
+    public int getVersion() {
+        return version;
     }
 }

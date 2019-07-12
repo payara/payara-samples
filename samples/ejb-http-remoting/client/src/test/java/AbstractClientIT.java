@@ -38,37 +38,51 @@
  *    holder.
  */
 
-import fish.payara.samples.ejbhttp.api.ExposedService;
-import fish.payara.samples.ejbhttp.api.RemoteService;
-import fish.payara.samples.ejbhttp.api.User;
-import org.junit.Test;
+import java.util.Arrays;
 
 import javax.naming.NamingException;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
-/**
- * Test using various lookup strings for obtaiing the proxy
- */
-public class LookupIT extends AbstractClientIT {
-    @Test
-    public void ejbByInterfaceName() throws NamingException {
-        if (getVersion() == 0) { // plain name no longer supported from v1
-            ExposedService bean = getConnector().lookup(ExposedService.class.getName());
-            assertThat(bean.createSimpleUser()).isInstanceOf(User.class);
-        }
+import fish.payara.ejb.http.protocol.SerializationType;
+import fish.payara.samples.ejbhttp.api.RemoteService;
+import fish.payara.samples.ejbhttp.client.RemoteConnector;
+
+@RunWith(Parameterized.class)
+public abstract class AbstractClientIT {
+
+    protected RemoteService remoteService;
+
+    @Parameters(name = "{0}")
+    public static Iterable<RemoteConnector> connectors() {
+        return Arrays.asList(RemoteConnector.values());
     }
 
-    @Test
-    public void ejbByBeanName() throws NamingException {
-        // Hybrid bean is not available by name as it implements both remote and local interface
-        RemoteService bean = getConnector().lookup("java:global/server-app/RemoteServiceBean");
-        assertThat(bean.createSimpleUser()).isInstanceOf(User.class);
+    @Parameter
+    public RemoteConnector connector;
+
+    @Before
+    public void lookup() throws NamingException {
+        remoteService = getConnector().lookup("java:global/server-app/RemoteServiceBean");
     }
 
-    @Test
-    public void ejbByBeanAndInterfaceName() throws NamingException {
-        ExposedService bean = getConnector().lookup("java:global/server-app/HybridBean!"+ExposedService.class.getName());
-        assertThat(bean.createSimpleUser()).isInstanceOf(User.class);
+    protected final RemoteConnector getConnector() {
+        return connector;
+    }
+
+    protected final boolean isJavaSerialization() {
+        return getSerializationType() == SerializationType.JAVA;
+    }
+
+    protected final SerializationType getSerializationType() {
+        return getConnector().getSerializationType();
+    }
+
+    protected final int getVersion() {
+        return getConnector().getVersion();
     }
 }

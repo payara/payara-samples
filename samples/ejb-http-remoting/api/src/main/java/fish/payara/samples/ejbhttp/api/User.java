@@ -40,10 +40,11 @@
 
 package fish.payara.samples.ejbhttp.api;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
     public String login;
     public LocalDate createdAt;
     public List<User> friends;

@@ -38,33 +38,27 @@
  *    holder.
  */
 
+import fish.payara.ejb.http.protocol.SerializationType;
 import fish.payara.samples.ejbhttp.api.Product;
 import fish.payara.samples.ejbhttp.api.Ranking;
-import fish.payara.samples.ejbhttp.api.RemoteService;
 import fish.payara.samples.ejbhttp.api.Stuff;
-import fish.payara.samples.ejbhttp.client.RemoteConnector;
-import org.junit.BeforeClass;
+import fish.payara.samples.ejbhttp.api.Stuff.Container;
+
 import org.junit.Test;
 
-import javax.naming.NamingException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
  * Ten customized JSON-B serialization
  */
-public class CustomizedTypesIT {
-    static RemoteService remoteService;
-
-    @BeforeClass
-    public static void lookup() throws NamingException {
-        remoteService = RemoteConnector.INSTANCE.lookup("java:global/server-app/RemoteServiceBean");
-    }
+public class CustomizedTypesIT extends AbstractClientIT {
 
     @Test
     public void annotatedSerializerTopLevelReturn() {
@@ -85,7 +79,12 @@ public class CustomizedTypesIT {
 
     @Test
     public void annotatedSerializerTopLevelReturnNull() {
-        assertThat(remoteService.polymorphicReturn(true).get()).isNull();
+        Container result = remoteService.polymorphicReturn(true);
+        if (getSerializationType() == SerializationType.JSON) {
+            assertThat(result.get()).isNull();
+        } else {
+            assertNull(result);
+        }
     }
 
     @Test
