@@ -294,7 +294,7 @@ public class ServerOperations {
     }
     
     public static String getPayaraDomainFromServer() {
-        System.out.println("Getting Payara domaain from server");
+        System.out.println("Getting Payara domain from server");
         
         List<String> output = new ArrayList<>();
         List<String> cmd = new ArrayList<>();
