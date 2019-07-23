@@ -514,6 +514,7 @@
             <properties>
                 <skipJMS>true</skipJMS>
                 <skipJAXWS>true</skipJAXWS>
+                <skipClientCertificate>true</skipClientCertificate>
             </properties>
 
             <dependencies>

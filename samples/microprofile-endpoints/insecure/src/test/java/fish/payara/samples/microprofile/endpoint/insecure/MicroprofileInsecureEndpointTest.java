@@ -37,12 +37,11 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.samples.microprofile.endpoint;
+package fish.payara.samples.microprofile.endpoint.insecure;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -52,29 +51,29 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import fish.payara.samples.CliCommands;
 import fish.payara.samples.ServerOperations;
 import static java.util.Arrays.asList;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+import static org.hamcrest.Matchers.containsString;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertThat;
 import org.junit.BeforeClass;
 
 /**
  * @author Gaurav Gupta
  */
 @RunWith(Arquillian.class)
-public class MicroprofileSecureEndpointTest {
+public class MicroprofileInsecureEndpointTest {
 
     @ArquillianResource
     private URL base;
 
     private WebClient webClient;
-    private final DefaultCredentialsProvider correctCreds = new DefaultCredentialsProvider();
-    private final DefaultCredentialsProvider incorrectCreds = new DefaultCredentialsProvider();
 
     @Deployment(testable = false)
     public static WebArchive createDeployment() {
@@ -85,25 +84,21 @@ public class MicroprofileSecureEndpointTest {
 
     @BeforeClass
     public static void enableSecurity() {
-        CliCommands.payaraGlassFish(asList("set-metrics-configuration", "--securityenabled", "true"));
-        CliCommands.payaraGlassFish(asList("set-microprofile-healthcheck-configuration", "--securityenabled", "true"));
-        CliCommands.payaraGlassFish(asList("set-openapi-configuration", "--securityenabled", "true"));
+        CliCommands.payaraGlassFish(asList("set-metrics-configuration", "--endpoint", "mpmetrics"));
+        CliCommands.payaraGlassFish(asList("set-microprofile-healthcheck-configuration", "--endpoint", "mphealth"));
         ServerOperations.restartContainer();
     }
 
     @AfterClass
     public static void resetSecurity() {
-        CliCommands.payaraGlassFish(asList("set-metrics-configuration", "--securityenabled", "false"));
-        CliCommands.payaraGlassFish(asList("set-microprofile-healthcheck-configuration", "--securityenabled", "false"));
-        CliCommands.payaraGlassFish(asList("set-openapi-configuration", "--securityenabled", "false"));
+        CliCommands.payaraGlassFish(asList("set-metrics-configuration", "--endpoint", "metrics"));
+        CliCommands.payaraGlassFish(asList("set-microprofile-healthcheck-configuration", "--endpoint", "health"));
         ServerOperations.restartContainer();
     }
 
     @Before
     public void setup() {
         webClient = new WebClient();
-        correctCreds.addCredentials("mp", "mp");
-        incorrectCreds.addCredentials("random", "random");
     }
 
     @After
@@ -113,55 +108,20 @@ public class MicroprofileSecureEndpointTest {
     }
 
     @Test
-    public void testMetricsWithCorrectCredentials() throws Exception {
-        webClient.setCredentialsProvider(correctCreds);
-        Page page = webClient.getPage(base + "../metrics");
-        assertEquals(200, page.getWebResponse().getStatusCode());
+    public void testMetrics() throws Exception {
+        Page page = webClient.getPage(base + "../mpmetrics");
+        assertEquals(SC_OK, page.getWebResponse().getStatusCode());
     }
 
     @Test
-    public void testMetricsWithIncorrectCredentials() throws Exception {
-        webClient.setCredentialsProvider(incorrectCreds);
-
+    public void testHeatlhCheck() throws Exception {
         try {
-            webClient.getPage(base + "../metrics");
-        } catch (FailingHttpStatusCodeException e) {
-            assertNotNull(e);
-            assertEquals(401, e.getStatusCode());
-            return;
+            Page page = webClient.getPage(base + "../mphealth");
+            assertEquals(SC_OK, page.getWebResponse().getStatusCode());
+        } catch (FailingHttpStatusCodeException ex) {
+            assertEquals(SC_SERVICE_UNAVAILABLE, ex.getStatusCode());
+            assertThat(ex.getResponse().getContentAsString(), containsString("No Application deployed"));
         }
-
-        fail("/metrics could be accessed without proper security credentials");
-    }
-
-    @Test
-    public void testHealthCheckWithIncorrectCredentials() throws Exception {
-        webClient.setCredentialsProvider(incorrectCreds);
-
-        try {
-            webClient.getPage(base + "../health");
-        } catch (FailingHttpStatusCodeException e) {
-            assertNotNull(e);
-            assertEquals(401, e.getStatusCode());
-            return;
-        }
-
-        fail("/health could be accessed without proper security credentials");
-    }
-
-    @Test
-    public void testOpenAPIWithIncorrectCredentials() throws Exception {
-        webClient.setCredentialsProvider(incorrectCreds);
-
-        try {
-            webClient.getPage(base + "../openapi");
-        } catch (FailingHttpStatusCodeException e) {
-            assertNotNull(e);
-            assertEquals(401, e.getStatusCode());
-            return;
-        }
-
-        fail("/openapi could be accessed without proper security credentials");
     }
 
 }
