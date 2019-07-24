@@ -1,10 +1,12 @@
 package fish.payara.samples;
 
+import com.gargoylesoftware.htmlunit.WebClient;
 import static java.nio.file.Files.copy;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +43,12 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import static org.omnifaces.utils.Lang.isEmpty;
 import org.omnifaces.utils.security.Certificates;
+import static org.omnifaces.utils.security.Certificates.createTempJKSKeyStore;
+import static org.omnifaces.utils.security.Certificates.createTempJKSTrustStore;
+import static org.omnifaces.utils.security.Certificates.generateRandomRSAKeys;
+import static org.omnifaces.utils.security.Certificates.getCertificateChainFromServer;
 
 /**
  * Various high level Java EE 7 samples specific operations to execute against
@@ -294,7 +301,7 @@ public class ServerOperations {
     }
     
     public static String getPayaraDomainFromServer() {
-        System.out.println("Getting Payara domaain from server");
+        System.out.println("Getting Payara domain from server");
         
         List<String> output = new ArrayList<>();
         List<String> cmd = new ArrayList<>();
@@ -526,6 +533,89 @@ public class ServerOperations {
         logger = LogFactory.getLog(com.gargoylesoftware.htmlunit.httpclient.HtmlUnitSSLConnectionSocketFactory.class);
         ((Jdk14Logger) logger).getLogger().setLevel(FINEST);
         Logger.getGlobal().getParent().getHandlers()[0].setLevel(FINEST);
+    }
+
+    public static String createClientKeyStore(){
+
+        Security.addProvider(new BouncyCastleProvider());
+
+        // Enable to get detailed logging about the SSL handshake on the client
+        // For an explanation of the TLS handshake see: https://tls.ulfheim.net
+        if (System.getProperty("ssl.debug") != null) {
+            enableSSLDebug();
+        }
+
+
+        // ### Generate keys for the client, create a certificate, and add those to a new local key store
+        // Generate a Private/Public key pair for the client
+        KeyPair clientKeyPair = generateRandomRSAKeys();
+
+        // Create a certificate containing the client public key and signed with the private key
+        X509Certificate clientCertificate = createSelfSignedCertificate(clientKeyPair);
+
+        // Create a new local key store containing the client private key and the certificate
+        String clientKeyStorePath = createTempJKSKeyStore(clientKeyPair.getPrivate(), clientCertificate);
+        System.setProperty("javax.net.ssl.keystore", clientKeyStorePath);
+
+        // Enable to get detailed logging about the SSL handshake on the server
+        if (System.getProperty("ssl.debug") != null) {
+            System.out.println("Setting server SSL debug on");
+            addContainerSystemProperty("javax.net.debug", "ssl:handshake");
+        }
+
+        // Only test TLS v1.2 for now
+        System.setProperty("jdk.tls.client.protocols", "TLSv1.2");
+
+        // Add the client certificate that we just generated to the trust store of the server.
+        // That way the server will trust our certificate.
+        // Set the actual domain used with -Dpayara_domain=[domain name]
+        addCertificateToContainerTrustStore(clientCertificate);
+
+        return clientKeyStorePath;
+    }
+
+    public static URL createClientTrustStore(WebClient webClient, URL base, String clientKeyStorePath) throws FileNotFoundException, IOException {
+
+        URL baseHttps = ServerOperations.toContainerHttps(base);
+        if (baseHttps == null) {
+            throw new IllegalStateException("No https URL could be created from " + base);
+        }
+
+        // ### Ask the server for its certificate and add that to a new local trust store
+        // Server -> client : the trust store certificates are used to validate the certificate sent
+        // by the server
+        X509Certificate[] serverCertificateChain = getCertificateChainFromServer(baseHttps.getHost(), baseHttps.getPort());
+
+        if (!isEmpty(serverCertificateChain)) {
+
+            System.out.println("Obtained certificate from server. Storing it in client trust store");
+
+            String trustStorePath = createTempJKSTrustStore(serverCertificateChain);
+            System.setProperty("javax.net.ssl.truststore", trustStorePath);
+
+            System.out.println("Reading trust store from: " + trustStorePath);
+
+            webClient.getOptions().setSSLTrustStore(new File(trustStorePath).toURI().toURL(), "changeit", "jks");
+
+            // If the use.cnHost property is we try to extract the host from the server
+            // certificate and use exactly that host for our requests.
+            // This is needed if a server is listening to multiple host names, for instance
+            // localhost and example.com. If the certificate is for example.com, we can't
+            // localhost for the request, as that will not be accepted.
+            if (System.getProperty("use.cnHost") != null) {
+                System.out.println("use.cnHost set. Trying to grab CN from certificate and use as host for requests.");
+                baseHttps = getHostFromCertificate(serverCertificateChain, baseHttps);
+            }
+        } else {
+            System.out.println("Could not obtain certificates from server. Continuing without custom truststore");
+        }
+
+        System.out.println("Using client key store from: " + clientKeyStorePath);
+
+        // Client -> Server : the key store's private keys and certificates are used to sign
+        // and sent a reply to the server
+        webClient.getOptions().setSSLClientCertificate(new File(clientKeyStorePath).toURI().toURL(), "changeit", "jks");
+        return baseHttps;
     }
 }
 
