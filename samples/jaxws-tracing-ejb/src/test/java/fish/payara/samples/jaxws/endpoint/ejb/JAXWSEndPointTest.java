@@ -65,12 +65,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import fish.payara.samples.CliCommands;
+import fish.payara.samples.PayaraArquillianTestRunner;
 import fish.payara.samples.SincePayara;
 
 /**
  * @author Arjan Tijms
  */
-@RunWith(Arquillian.class)
+@RunWith(PayaraArquillianTestRunner.class)
 @FixMethodOrder(NAME_ASCENDING)
 @SincePayara(PAYARA_5_193)
 public class JAXWSEndPointTest {
