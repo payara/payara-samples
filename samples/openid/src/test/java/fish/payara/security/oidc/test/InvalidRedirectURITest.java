@@ -41,6 +41,8 @@ package fish.payara.security.oidc.test;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
+import fish.payara.samples.NotMicroCompatible;
+import fish.payara.samples.PayaraArquillianTestRunner;
 import static fish.payara.security.annotations.OpenIdAuthenticationDefinition.OPENID_MP_REDIRECT_URI;
 import java.io.IOException;
 import java.net.URL;
@@ -62,7 +64,8 @@ import org.junit.runner.RunWith;
  *
  * @author Gaurav Gupta
  */
-@RunWith(Arquillian.class)
+@NotMicroCompatible
+@RunWith(PayaraArquillianTestRunner.class)
 public class InvalidRedirectURITest {
 
     private WebClient webClient;

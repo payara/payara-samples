@@ -60,6 +60,8 @@ import org.junit.runner.RunWith;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
+import fish.payara.samples.NotMicroCompatible;
+import fish.payara.samples.PayaraArquillianTestRunner;
 
 import fish.payara.samples.security.oauth2.testapp.Callback;
 import fish.payara.samples.security.oauth2.testapp.Endpoint;
@@ -70,7 +72,8 @@ import fish.payara.samples.security.oauth2.testapp.UnsecuredPage;
  *
  * @author jonathan coustick
  */
-@RunWith(Arquillian.class)
+@NotMicroCompatible
+@RunWith(PayaraArquillianTestRunner.class)
 public class OAuthTest {
     
     private WebClient webClient;

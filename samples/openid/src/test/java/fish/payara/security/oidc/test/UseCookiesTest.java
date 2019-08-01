@@ -40,6 +40,8 @@
 package fish.payara.security.oidc.test;
 
 import com.gargoylesoftware.htmlunit.WebClient;
+import fish.payara.samples.NotMicroCompatible;
+import fish.payara.samples.PayaraArquillianTestRunner;
 import static fish.payara.security.annotations.OpenIdAuthenticationDefinition.OPENID_MP_USE_SESSION;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,7 +62,8 @@ import fish.payara.samples.ServerOperations;
  *
  * @author Gaurav Gupta
  */
-@RunWith(Arquillian.class)
+@NotMicroCompatible
+@RunWith(PayaraArquillianTestRunner.class)
 public class UseCookiesTest {
 
     private WebClient webClient;
