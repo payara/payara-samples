@@ -54,7 +54,6 @@ import javax.xml.ws.Service;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -65,12 +64,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import fish.payara.samples.CliCommands;
+import fish.payara.samples.PayaraArquillianTestRunner;
 import fish.payara.samples.SincePayara;
 
 /**
  * @author Arjan Tijms
  */
-@RunWith(Arquillian.class)
+@RunWith(PayaraArquillianTestRunner.class)
 @FixMethodOrder(NAME_ASCENDING)
 @SincePayara(PAYARA_5_193)
 public class JAXWSEndPointTest {

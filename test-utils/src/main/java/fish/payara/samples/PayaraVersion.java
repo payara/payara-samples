@@ -110,6 +110,19 @@ public enum PayaraVersion {
         return false;
     }
     
+    /**
+     * A method used to determine if we're using the payara-micro profile when running the test suite
+     * Method will be used in conjunction with the <code>@NotMicroCompatible</code> annotation
+     * 
+     * @return whether or not it's running micro profile 
+     */
+    public static boolean isUsingPayaraMicroProfile() {
+        if(System.getProperty("isUsingMicroProfile").equals("true")) {
+            return true;
+        }
+        return false;
+    }
+    
     public boolean isExcludedFromTestPriorTo(PayaraVersion since){
 
         if (since != null) {

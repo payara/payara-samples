@@ -48,6 +48,7 @@ import org.junit.runners.model.InitializationError;
 import org.jboss.arquillian.junit.Arquillian;
 
 import static fish.payara.samples.PayaraVersion.isPayaraSystemPropertyVersionExcludedFromTestPriorTo;
+import static fish.payara.samples.PayaraVersion.isUsingPayaraMicroProfile;
 
 /**
  * An extension of the Arquillian Test Runner. 
@@ -72,6 +73,11 @@ public class PayaraArquillianTestRunner extends Arquillian {
             SincePayara sincePayara = klass.getAnnotation(SincePayara.class);
             skipEntireClass = isPayaraSystemPropertyVersionExcludedFromTestPriorTo(sincePayara.value());
         }
+        
+        if (klass.getAnnotation(NotMicroCompatible.class) != null) {
+            NotMicroCompatible notMicro = klass.getAnnotation(NotMicroCompatible.class);
+            skipEntireClass = isUsingPayaraMicroProfile();
+        }
     }
     
     @Override
@@ -87,6 +93,8 @@ public class PayaraArquillianTestRunner extends Arquillian {
             
              if (testMethod.getAnnotation(SincePayara.class) != null 
                     && isPayaraSystemPropertyVersionExcludedFromTestPriorTo(testMethod.getAnnotation(SincePayara.class).value())) {
+                //don't add to test list
+            } else if (testMethod.getAnnotation(NotMicroCompatible.class) != null && isUsingPayaraMicroProfile()) {
                 //don't add to test list
             } else {
                 result.add(testMethod);

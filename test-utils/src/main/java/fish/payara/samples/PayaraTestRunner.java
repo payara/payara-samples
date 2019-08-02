@@ -48,6 +48,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
 import static fish.payara.samples.PayaraVersion.isPayaraSystemPropertyVersionExcludedFromTestPriorTo;
+import static fish.payara.samples.PayaraVersion.isUsingPayaraMicroProfile;
 
 /**
  * An extension of the BlockJUnit4ClassRunner. To be used when {@link fish.payara.samples.SincePayara @SincePayara} is used.
@@ -72,6 +73,11 @@ public class PayaraTestRunner extends BlockJUnit4ClassRunner {
             SincePayara sincePayara = klass.getAnnotation(SincePayara.class);
             skipEntireClass = isPayaraSystemPropertyVersionExcludedFromTestPriorTo(sincePayara.value());
         }
+        
+        if (klass.getAnnotation(NotMicroCompatible.class) != null) {
+            NotMicroCompatible notMicro = klass.getAnnotation(NotMicroCompatible.class);
+            skipEntireClass = isUsingPayaraMicroProfile();
+        }
 
     }
     
@@ -88,6 +94,8 @@ public class PayaraTestRunner extends BlockJUnit4ClassRunner {
             
             if (testMethod.getAnnotation(SincePayara.class) != null 
                     && isPayaraSystemPropertyVersionExcludedFromTestPriorTo(testMethod.getAnnotation(SincePayara.class).value())) {
+                //don't add to test list
+            } else if (testMethod.getAnnotation(NotMicroCompatible.class) != null && isUsingPayaraMicroProfile()) {
                 //don't add to test list
             } else {
                 result.add(testMethod);

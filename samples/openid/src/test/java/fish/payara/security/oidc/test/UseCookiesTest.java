@@ -40,6 +40,8 @@
 package fish.payara.security.oidc.test;
 
 import com.gargoylesoftware.htmlunit.WebClient;
+import fish.payara.samples.NotMicroCompatible;
+import fish.payara.samples.PayaraArquillianTestRunner;
 import static fish.payara.security.annotations.OpenIdAuthenticationDefinition.OPENID_MP_USE_SESSION;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,7 +49,6 @@ import java.net.URL;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -60,7 +61,8 @@ import fish.payara.samples.ServerOperations;
  *
  * @author Gaurav Gupta
  */
-@RunWith(Arquillian.class)
+@NotMicroCompatible
+@RunWith(PayaraArquillianTestRunner.class)
 public class UseCookiesTest {
 
     private WebClient webClient;

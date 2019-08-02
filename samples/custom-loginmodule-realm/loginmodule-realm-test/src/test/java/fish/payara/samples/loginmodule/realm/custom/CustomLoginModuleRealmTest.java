@@ -51,7 +51,6 @@ import java.util.List;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -66,9 +65,12 @@ import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 
 import fish.payara.samples.CliCommands;
+import fish.payara.samples.NotMicroCompatible;
+import fish.payara.samples.PayaraArquillianTestRunner;
 import static fish.payara.samples.ServerOperations.*;
 
-@RunWith(Arquillian.class)
+@NotMicroCompatible
+@RunWith(PayaraArquillianTestRunner.class)
 public class CustomLoginModuleRealmTest {
 
     private static final String WEBAPP_SOURCE = "src/main/webapp";

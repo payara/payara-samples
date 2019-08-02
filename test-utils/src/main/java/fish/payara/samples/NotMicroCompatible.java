@@ -1,8 +1,8 @@
 /*
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- *  Copyright (c) [2018] Payara Foundation and/or its affiliates. All rights reserved.
- *
+ * 
+ *  Copyright (c) [2019] Payara Foundation and/or its affiliates. All rights reserved.
+ * 
  *  The contents of this file are subject to the terms of either the GNU
  *  General Public License Version 2 only ("GPL") or the Common Development
  *  and Distribution License("CDDL") (collectively, the "License").  You
@@ -14,17 +14,17 @@
  *
  *  When distributing the software, include this License Header Notice in each
  *  file and include the License file at glassfish/legal/LICENSE.txt.
- *
+ * 
  *  GPL Classpath Exception:
  *  The Payara Foundation designates this particular file as subject to the "Classpath"
  *  exception as provided by the Payara Foundation in the GPL Version 2 section of the License
  *  file that accompanied this code.
- *
+ * 
  *  Modifications:
  *  If applicable, add the following below the License Header, with the fields
  *  enclosed by brackets [] replaced by your own identifying information:
  *  "Portions Copyright [year] [name of copyright owner]"
- *
+ * 
  *  Contributor(s):
  *  If you wish your version of this file to be governed by only the CDDL or
  *  only the GPL Version 2, indicate your decision by adding "[Contributor]
@@ -37,60 +37,23 @@
  *  only if the new code is made subject to such option by the copyright
  *  holder.
  */
-package fish.payara.security.oidc.test;
+package fish.payara.samples;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import fish.payara.samples.NotMicroCompatible;
-import fish.payara.samples.PayaraArquillianTestRunner;
-import static fish.payara.security.annotations.OpenIdAuthenticationDefinition.OPENID_MP_USE_NONCE;
-import java.io.IOException;
-import java.net.URL;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.OperateOnDeployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- *
- * @author Gaurav Gupta
+ * Annotation used to specify that a test is not applicable to Payara Micro
+ * Use in combination with <code>@RunWith(PayaraTestRunner.class)</code> or <code>@RunWith(PayaraArquillianTestRunner.class)</code> annotation
+ * 
+ * Can also be used in conjunction with <code>@SincePayara</code> to denote versioning
+ * 
+ * @see fish.payara.samples.*
+ * 
+ * @author Cuba Stanley
  */
-@NotMicroCompatible
-@RunWith(PayaraArquillianTestRunner.class)
-public class WithoutNonceTest {
-
-    private WebClient webClient;
-
-    @OperateOnDeployment("openid-client")
-    @ArquillianResource
-    private URL base;
-
-    @Before
-    public void init() {
-        webClient = new WebClient();
-    }
-
-    @Deployment(name = "openid-server")
-    public static WebArchive createServerDeployment() {
-        return OpenIdTestUtil.createServerDeployment();
-    }
-
-    @Deployment(name = "openid-client")
-    public static WebArchive createClientDeployment() {
-        StringAsset mpConfig = new StringAsset(OPENID_MP_USE_NONCE + "=" + Boolean.FALSE.toString());
-        return OpenIdTestUtil
-                .createClientDeployment()
-                .addAsWebInfResource(mpConfig, "classes/META-INF/microprofile-config.properties");
-    }
-
-    @Test
-    @RunAsClient
-    public void testOpenIdConnect() throws IOException {
-        OpenIdTestUtil.testOpenIdConnect(webClient, base);
-    }
-
-}
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface NotMicroCompatible {}
