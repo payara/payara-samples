@@ -74,7 +74,7 @@ public class PayaraArquillianTestRunner extends Arquillian {
             skipEntireClass = isPayaraSystemPropertyVersionExcludedFromTestPriorTo(sincePayara.value());
         }
         
-        if(klass.getAnnotation(NotMicroCompatible.class) != null) {
+        if (klass.getAnnotation(NotMicroCompatible.class) != null) {
             NotMicroCompatible notMicro = klass.getAnnotation(NotMicroCompatible.class);
             skipEntireClass = isUsingPayaraMicroProfile();
         }
@@ -94,7 +94,7 @@ public class PayaraArquillianTestRunner extends Arquillian {
              if (testMethod.getAnnotation(SincePayara.class) != null 
                     && isPayaraSystemPropertyVersionExcludedFromTestPriorTo(testMethod.getAnnotation(SincePayara.class).value())) {
                 //don't add to test list
-            } else if(testMethod.getAnnotation(NotMicroCompatible.class) != null && isUsingPayaraMicroProfile()) {
+            } else if (testMethod.getAnnotation(NotMicroCompatible.class) != null && isUsingPayaraMicroProfile()) {
                 //don't add to test list
             } else {
                 result.add(testMethod);
