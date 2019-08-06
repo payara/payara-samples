@@ -73,12 +73,14 @@ public class AutoNameInstancesTest extends AsadminTest {
                 "--node", "localhost-" + domainName,
                 "-T",
                 conflictInstanceName);
-        assertSuccess(result);
-
-        // Cleanup
-        String generatedInstanceName = result.getOutput();
-        asadmin("delete-instance", conflictInstanceName);
-        asadmin("delete-instance", generatedInstanceName);
+        try {
+            assertSuccess(result);
+        } finally {
+            // Cleanup
+            String generatedInstanceName = result.getOutput();
+            asadmin("delete-instance", conflictInstanceName);
+            asadmin("delete-instance", generatedInstanceName);
+        }
     }
 
     @Test
@@ -87,11 +89,14 @@ public class AutoNameInstancesTest extends AsadminTest {
                 "-a",
                 "--node", "localhost-" + domainName,
                 "--extraTerse", "true");
-        assertSuccess(result);
 
-        // Cleanup
-        String generatedInstanceName = result.getOutput();
-        asadmin("delete-instance", generatedInstanceName);
+        try {
+            assertSuccess(result);
+        } finally {
+            // Cleanup
+            String generatedInstanceName = result.getOutput();
+            asadmin("delete-instance", generatedInstanceName);
+        }
     }
 
 }
