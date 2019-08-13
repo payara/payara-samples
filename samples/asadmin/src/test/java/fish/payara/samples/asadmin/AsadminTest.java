@@ -56,7 +56,6 @@ import org.glassfish.internal.api.Globals;
 import org.glassfish.internal.api.Target;
 import org.hamcrest.CoreMatchers;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -67,7 +66,9 @@ import org.jvnet.hk2.config.UnsatisfiedDependencyException;
 import com.sun.enterprise.config.serverbeans.Domain;
 import com.sun.enterprise.config.serverbeans.DomainExtension;
 
-@RunWith(Arquillian.class)
+import fish.payara.samples.PayaraArquillianTestRunner;
+
+@RunWith(PayaraArquillianTestRunner.class)
 public abstract class AsadminTest {
 
     private ServiceLocator serviceLocator = Globals.getDefaultHabitat();
