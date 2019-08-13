@@ -17,6 +17,7 @@
     <modules>
         <module>clustered-singleton</module>
         <module>custom-loginmodule-realm</module>
+        <module>dynamic-roles</module>
         <module>jacc-per-app</module>
         <module>jaxrs-rolesallowed</module>
         <module>jaxrs-rolesallowed-servlet</module>
