@@ -39,6 +39,7 @@
  */
 package fish.payara.samples.asadmin;
 
+import fish.payara.samples.NotMicroCompatible;
 import fish.payara.samples.PayaraVersion;
 import fish.payara.samples.ServerOperations;
 import fish.payara.samples.SincePayara;
@@ -47,6 +48,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SincePayara(PayaraVersion.PAYARA_5_193)
+@NotMicroCompatible
 public class AutoNameInstancesTest extends AsadminTest {
 
     private static String domainName = "domain1";
