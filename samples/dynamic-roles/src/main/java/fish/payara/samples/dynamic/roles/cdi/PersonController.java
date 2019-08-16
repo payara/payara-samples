@@ -41,9 +41,9 @@ package fish.payara.samples.dynamic.roles.cdi;
 
 import fish.payara.cdi.auth.roles.CallerAccessException;
 import fish.payara.samples.dynamic.roles.common.Person;
-import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

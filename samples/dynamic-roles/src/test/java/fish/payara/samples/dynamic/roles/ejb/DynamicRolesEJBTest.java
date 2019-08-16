@@ -41,10 +41,10 @@ package fish.payara.samples.dynamic.roles.ejb;
 
 import fish.payara.samples.dynamic.roles.PersonControllerClient;
 import static fish.payara.samples.dynamic.roles.PersonControllerClientHelper.getPersonControllerClient;
-import fish.payara.samples.dynamic.roles.common.Person;
 import fish.payara.samples.dynamic.roles.common.AuthoritiesConstants;
 import static fish.payara.samples.dynamic.roles.common.AuthoritiesConstants.DEFAULT_PASSWORD;
 import static fish.payara.samples.dynamic.roles.common.AuthoritiesConstants.DEFAULT_USER;
+import fish.payara.samples.dynamic.roles.common.Person;
 import static fish.payara.samples.dynamic.roles.common.Person.DEFAULT_INSTANCE;
 import static fish.payara.samples.dynamic.roles.common.Person.DEFAULT_INVALID_ACCEESS_TYPE_INSTANCE;
 import java.io.File;
@@ -58,13 +58,13 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.runner.RunWith;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import static org.valid4j.matchers.http.HttpResponseMatchers.hasStatus;
 
 /**
@@ -92,7 +92,7 @@ public class DynamicRolesEJBTest {
     @RunAsClient
     public void testAuthWithCorrectAccessType() {
         PersonControllerClient client = getPersonControllerClient(deploymentUrl, DEFAULT_USER, DEFAULT_PASSWORD);
-        
+
         Response response = client.createPerson(DEFAULT_INSTANCE);
         assertThat(response, hasStatus(CREATED));
     }

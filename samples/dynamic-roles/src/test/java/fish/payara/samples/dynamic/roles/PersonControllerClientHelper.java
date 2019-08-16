@@ -65,7 +65,7 @@ public class PersonControllerClientHelper {
                     .build(PersonControllerClient.class);
             return client;
         } catch (URISyntaxException | MalformedURLException ex) {
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
     }
 }

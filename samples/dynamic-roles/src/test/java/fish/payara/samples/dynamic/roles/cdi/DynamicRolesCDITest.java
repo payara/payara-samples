@@ -57,9 +57,9 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ArchivePaths;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Test;
@@ -88,14 +88,14 @@ public class DynamicRolesCDITest {
     }
 
     @Test
-    @RunAsClient    
+    @RunAsClient
     public void testAuthWithCorrectAccessType() {
         PersonControllerClient client = getPersonControllerClient(deploymentUrl, DEFAULT_USER, DEFAULT_PASSWORD);
-        
+
         Response response = client.createPerson(DEFAULT_INSTANCE);
         assertThat(response, hasStatus(CREATED));
     }
-    
+
     @Test
     @RunAsClient
     public void testAuthWithIncorrectAccessType() {
@@ -108,6 +108,5 @@ public class DynamicRolesCDITest {
             assertThat(wae.getResponse(), hasStatus(FORBIDDEN));
         }
     }
-
 
 }

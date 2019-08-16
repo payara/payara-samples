@@ -73,14 +73,14 @@ public class PersonController {
                     .created(new URI("/resources/api/person/" + person.getId()))
                     .build();
         } catch (EJBException ex) {
-            if(ex.getCausedByException() instanceof CallerAccessException){
+            if (ex.getCausedByException() instanceof CallerAccessException) {
                 return Response.status(FORBIDDEN)
-                    .entity(ex.getMessage())
-                    .build();
+                        .entity(ex.getMessage())
+                        .build();
             } else {
                 return Response.status(INTERNAL_SERVER_ERROR)
-                    .entity(ex.getMessage())
-                    .build();
+                        .entity(ex.getMessage())
+                        .build();
             }
         }
     }
@@ -96,14 +96,14 @@ public class PersonController {
                     .created(new URI("/resources/api/person/" + person.getId()))
                     .build();
         } catch (EJBException ex) {
-            if(ex.getCausedByException() instanceof CallerAccessException){
+            if (ex.getCausedByException() instanceof CallerAccessException) {
                 return Response.status(FORBIDDEN)
-                    .entity(ex.getMessage())
-                    .build();
+                        .entity(ex.getMessage())
+                        .build();
             } else {
                 return Response.status(INTERNAL_SERVER_ERROR)
-                    .entity(ex.getMessage())
-                    .build();
+                        .entity(ex.getMessage())
+                        .build();
             }
         }
     }

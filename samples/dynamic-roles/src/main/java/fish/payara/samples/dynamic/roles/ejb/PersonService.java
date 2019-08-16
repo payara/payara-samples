@@ -39,9 +39,9 @@
  */
 package fish.payara.samples.dynamic.roles.ejb;
 
-import fish.payara.samples.dynamic.roles.common.Person;
 import fish.payara.cdi.auth.roles.RolesPermitted;
 import static fish.payara.samples.dynamic.roles.common.AuthoritiesConstants.ADMIN;
+import fish.payara.samples.dynamic.roles.common.Person;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.inject.Named;
@@ -59,13 +59,13 @@ public class PersonService {
     public void create(@NotNull @Named("person") Person person) {
         System.out.println("Person created: " + person.getId());
     }
-    
+
     @RolesAllowed(ADMIN)
     @RolesPermitted("#{'ROLE_'.concat(self.convert(param.accessType))}")
     public void createWithInlineMethodCall(Person person) {
         System.out.println("Person created with inline method call : " + person.getId());
     }
-    
+
     public String convert(String accessType) {
         return accessType.toUpperCase();
     }

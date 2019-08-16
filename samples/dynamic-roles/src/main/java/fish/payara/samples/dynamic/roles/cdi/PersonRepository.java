@@ -40,9 +40,9 @@
 package fish.payara.samples.dynamic.roles.cdi;
 
 import static fish.payara.cdi.auth.roles.LogicalOperator.AND;
-import fish.payara.samples.dynamic.roles.common.Person;
 import fish.payara.cdi.auth.roles.RolesPermitted;
 import static fish.payara.samples.dynamic.roles.common.AuthoritiesConstants.ADMIN;
+import fish.payara.samples.dynamic.roles.common.Person;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;

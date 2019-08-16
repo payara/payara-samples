@@ -44,13 +44,11 @@ import static fish.payara.samples.dynamic.roles.common.AuthoritiesConstants.DEFA
 import static fish.payara.samples.dynamic.roles.common.AuthoritiesConstants.DEFAULT_USER;
 import static fish.payara.samples.dynamic.roles.common.AuthoritiesConstants.USER;
 import static java.util.Arrays.asList;
-import static javax.security.enterprise.identitystore.CredentialValidationResult.INVALID_RESULT;
-
 import java.util.HashSet;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.security.enterprise.credential.UsernamePasswordCredential;
 import javax.security.enterprise.identitystore.CredentialValidationResult;
+import static javax.security.enterprise.identitystore.CredentialValidationResult.INVALID_RESULT;
 import javax.security.enterprise.identitystore.IdentityStore;
 
 /**
@@ -66,7 +64,7 @@ public class SampleIdentityStore implements IdentityStore {
                 && userLoginCredential.getPasswordAsString().equals(DEFAULT_PASSWORD)) {
             return new CredentialValidationResult("DEFAULT_USER", new HashSet<>(asList(ADMIN, USER)));
         }
-        
+
         return INVALID_RESULT;
     }
 }
