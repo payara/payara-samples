@@ -13,7 +13,6 @@ import java.net.URL;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -22,6 +21,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import fish.payara.arquillian.ws.rs.WebApplicationException;
+import fish.payara.samples.NotMicroCompatible;
+import fish.payara.samples.PayaraArquillianTestRunner;
 
 /**
  * This sample tests that we can install a custom JACC provider
@@ -29,7 +30,8 @@ import fish.payara.arquillian.ws.rs.WebApplicationException;
  *
  * @author Arjan Tijms
  */
-@RunWith(Arquillian.class)
+@RunWith(PayaraArquillianTestRunner.class)
+@NotMicroCompatible
 public class InstallJaccProviderTest {
 
     @ArquillianResource
