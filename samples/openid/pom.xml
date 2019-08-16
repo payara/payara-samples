@@ -49,14 +49,5 @@
     <artifactId>openid</artifactId>
     <name>Payara Samples - Payara - OpenId Connect</name>
     <packaging>war</packaging>
-    
-    <dependencies>
-        <dependency>
-            <groupId>fish.payara.samples</groupId>
-            <artifactId>test-utils</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
 </project>
