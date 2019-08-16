@@ -78,7 +78,10 @@ public abstract class AsadminTest {
     @Deployment
     public static Archive<?> deploy() {
         return ShrinkWrap.create(JavaArchive.class)
-                .addClasses(AsadminTest.class);
+                .addClasses(AsadminTest.class, PayaraArquillianTestRunner.class, 
+                    fish.payara.samples.SincePayara.class, 
+                    fish.payara.samples.NotMicroCompatible.class, 
+                    fish.payara.samples.PayaraVersion.class);
     }
 
     @Before
