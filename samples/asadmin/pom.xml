@@ -45,10 +45,5 @@
             <artifactId>payara-embedded-all</artifactId>
             <version>${payara.version}</version>
         </dependency>
-        <dependency>
-            <groupId>fish.payara.samples</groupId>
-            <artifactId>test-utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 </project>
