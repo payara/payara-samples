@@ -2,6 +2,7 @@ package fish.payara.samples;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,6 +22,10 @@ public class CliCommands {
     
     private static final Logger logger = Logger.getLogger(CliCommands.class.getName()); 
     private static final String OS = System.getProperty("os.name").toLowerCase();
+    
+    public static int payaraGlassFish(String... cliCommands) {
+        return payaraGlassFish(asList(cliCommands), null);
+    }
     
     public static int payaraGlassFish(List<String> cliCommands) {
         return payaraGlassFish(cliCommands, null);
