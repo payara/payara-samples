@@ -1,20 +1,20 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fish.payara.samples</groupId>
-  <artifactId>classpath</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <name>Classpath tests</name>
-  <description>These test verify that artifacts provide classpath isolated enough not to interfere with client code
-  in unexpected ways.</description>
+    <parent>
+        <groupId>fish.payara.samples</groupId>
+        <artifactId>parent-aggregator</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
-  <properties>
-    <payara.version>5.192-SNAPSHOT</payara.version>
-  </properties>
+    <artifactId>classpath</artifactId>
+    <packaging>pom</packaging>
 
-  <modules>
-    <module>embedded-vs-jersey</module>
-  </modules>
+    <name>Classpath tests</name>
+    <description>These test verify that artifacts provide classpath isolated enough not to interfere with client code in unexpected ways.</description>
+
+    <modules>
+        <module>embedded-vs-jersey</module>
+    </modules>
+
 </project>

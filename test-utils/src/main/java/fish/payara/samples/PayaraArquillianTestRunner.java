@@ -62,8 +62,6 @@ import static fish.payara.samples.PayaraVersion.isUsingPayaraMicroProfile;
  */
 public class PayaraArquillianTestRunner extends Arquillian {
     
-    private static final String PAYARA_VERSION = "payara.version";
-    
     private boolean skipEntireClass;
 
     public PayaraArquillianTestRunner(Class<?> klass) throws InitializationError {
@@ -75,7 +73,6 @@ public class PayaraArquillianTestRunner extends Arquillian {
         }
         
         if (klass.getAnnotation(NotMicroCompatible.class) != null) {
-            NotMicroCompatible notMicro = klass.getAnnotation(NotMicroCompatible.class);
             skipEntireClass = isUsingPayaraMicroProfile();
         }
     }

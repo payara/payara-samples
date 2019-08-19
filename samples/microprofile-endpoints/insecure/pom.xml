@@ -39,14 +39,6 @@
     <name>Payara Samples - Payara - Microprofile insecure endpoints</name>
     <packaging>war</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>test-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-
     <profiles>
         <profile>
             <id>payara-micro-managed</id>
