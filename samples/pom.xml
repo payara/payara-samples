@@ -15,6 +15,7 @@
     <name>Payara Samples - Payara</name>
 
     <modules>
+        <module>clustered-singleton</module>
         <module>custom-loginmodule-realm</module>
         <module>jacc-per-app</module>
         <module>jaxrs-rolesallowed</module>
