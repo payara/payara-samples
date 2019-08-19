@@ -39,6 +39,7 @@
  */
 package fish.payara.samples;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.After;
@@ -48,41 +49,74 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
 /**
- * An extension of the BlockJUnit4ClassRunner. To be used when
- * {@link fish.payara.samples.SincePayara @SincePayara} is used. Decides based
- * on the annotations of {@link fish.payara.samples.SincePayara @SincePayara}
- * which tests should be run
+ * A class used by all Payara test runners to utilise the custom annotations.
  * 
- * See also PayaraArquillianTestRunner which is a copy of this class for
- * Arquillian test cases
- * 
- * @see fish.payara.samples.PayaraArquillianTestRunner
- * 
- * @author Mark Wareham
+ * @author Matt Gill
  */
-public class PayaraTestRunner extends BlockJUnit4ClassRunner {
+public class PayaraTestRunnerDelegate extends BlockJUnit4ClassRunner {
 
-    private final PayaraTestRunnerDelegate delegate;
+    private static final String IS_PAYARA_MICROPROFILE_PROPERTY_NAME = "isUsingMicroProfile";
+    private static final String PAYARA_VERSION_PROPERTY_NAME = "payara.version";
 
-    public PayaraTestRunner(Class<?> klass) throws InitializationError {
+    private boolean skipEntireClass;
+
+    private final PayaraVersion version;
+    private final boolean isMicroProfile;
+
+    public PayaraTestRunnerDelegate(Class<?> klass) throws InitializationError {
         super(klass);
-        this.delegate = new PayaraTestRunnerDelegate(klass);
+
+        this.version = new PayaraVersion(System.getProperty(PAYARA_VERSION_PROPERTY_NAME));
+
+        final SincePayara sinceAnnotation = klass.getAnnotation(SincePayara.class);
+        if (sinceAnnotation != null) {
+
+            // Get versions to compare
+            PayaraVersion since = new PayaraVersion(sinceAnnotation.value());
+
+            if (version.isValid() && since.isValid()) {
+                skipEntireClass |= !version.isAtLeast(since);
+            }
+        }
+
+        this.isMicroProfile = Boolean.valueOf(System.getProperty(IS_PAYARA_MICROPROFILE_PROPERTY_NAME));
+        if (klass.getAnnotation(NotMicroCompatible.class) != null) {
+            skipEntireClass |= this.isMicroProfile;
+        }
     }
 
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
-        return delegate.computeTestMethods();
+
+        List<FrameworkMethod> result = new ArrayList<>();
+
+        if (skipEntireClass) {
+            return result;
+        }
+
+        for (FrameworkMethod testMethod : super.computeTestMethods()) {
+
+            // If the SinceVersion exists and the current Payara version is not greater than
+            // or equal to it
+            final SincePayara sincePayaraAnnotation = testMethod.getAnnotation(SincePayara.class);
+            final PayaraVersion sinceVersion = new PayaraVersion(sincePayaraAnnotation != null? sincePayaraAnnotation.value() : null);
+            if (version.isValid() && sinceVersion.isValid() && !version.isAtLeast(version)) {
+                continue;
+            }
+
+            // If the test is not micro compatible and micro is enabled
+            if (this.isMicroProfile && testMethod.getAnnotation(NotMicroCompatible.class) != null) {
+                continue;
+            }
+
+            result.add(testMethod);
+        }
+
+        return result;
     }
 
-    /**
-     * Overrides parent to remove warning of no valid methods if none are applicable
-     * 
-     * @param errors
-     */
     @Override
-    protected void validateInstanceMethods(List<Throwable> errors) {
-        validatePublicVoidNoArgMethods(After.class, false, errors);
-        validatePublicVoidNoArgMethods(Before.class, false, errors);
-        validateTestMethods(errors);
+    protected void collectInitializationErrors(List<Throwable> errors) {
+        // Do nothing - this class is for test calculation only
     }
 }

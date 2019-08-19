@@ -39,102 +39,98 @@
  */
 package fish.payara.samples;
 
+import java.util.Scanner;
+
 /**
- * Enum representing the versions of Payara. It does not represent all versions because it only needs to include those
- * used in the <code>@SincePayara</code> annotation.
- * This class also contains methods to determine against the system property, whether the version should be tested.
- * @author Mark Wareham
+ * A utility class to store the Payara Version and check if it's more recent than another version.
+ * 
+ * @author Matt Gill
  */
-public enum PayaraVersion {
+public class PayaraVersion {
 
-    // order is important!
-    // order is important!
-    // order is important!
-    
-    PAYARA_5_181("5.181"),
-    PAYARA_5_182("5.182"),
-    PAYARA_5_183("5.183"),
-    PAYARA_5_184("5.184"),
-    PAYARA_5_191("5.191"),
-    PAYARA_5_192("5.192"),
-    PAYARA_5_193("5.193"),
-    PAYARA_5_194("5.194"),
-    PAYARA_5_201("5.201"),
-    PAYARA_5_202("5.202");
-    
-    
-    private final String version;    
-    private static final String PAYARA_VERSION_PROPERTY_NAME = "payara.version";
+    private static final String VERSION_REGEX = "^([0-9.]+)+.+$";
 
-    private PayaraVersion (String version) {
-        this.version = version;
+    private final String versionString;
+
+    public PayaraVersion(String versionString) {
+        this.versionString = versionString;
     }
 
-    @Override
-    public String toString(){
-        return version;
+    public boolean isValid() {
+        return versionString != null && versionString.matches(VERSION_REGEX);
     }
-    
-    public static PayaraVersion fromString(String version){
-        String plainVersion = version.replaceAll("-.*", "");// remove everything after the hyphen (eg. -SNAPSHOT -RC1)
-        
-        if(plainVersion!=null && !plainVersion.isEmpty()) {
-            for(PayaraVersion loopVersion : PayaraVersion.values()) {
-                if(loopVersion.toString().equals(plainVersion)){
-                    return loopVersion;
+
+    public boolean isAtLeast(PayaraVersion minimum) {
+        try {
+            return compare(minimum) >= 0;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
+
+    public boolean isMoreRecentThan(PayaraVersion minimum) {
+        try {
+            return compare(minimum) > 0;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
+
+    private int compare(PayaraVersion minimum) {
+        if (!isValid() || !minimum.isValid()) {
+            throw new IllegalArgumentException("Unable to compare versions.");
+        }
+
+        try (Scanner minScanner = new Scanner(minimum.versionString);
+            Scanner vScanner = new Scanner(versionString)) {
+            minScanner.useDelimiter("\\.");
+            vScanner.useDelimiter("\\.");
+
+            while (minScanner.hasNext() || vScanner.hasNext()) {
+                // Get the next part of the version
+                String versionPart = vScanner.hasNext() ? vScanner.next() : "0";
+                int versionPartInteger = extractInteger(versionPart);
+
+                // Get the next part of the minimum version
+                String minVersionPart = minScanner.hasNext() ? minScanner.next() : "0";
+                int minVersionPartInteger = extractInteger(minVersionPart);
+
+                // If the versions are miles apart, proceed the version part until it is comparable
+                // to the minimum version
+                while (vScanner.hasNext() && Math.abs(versionPartInteger - minVersionPartInteger) > 100) {
+                    versionPart = vScanner.next();
+                    versionPartInteger = extractInteger(versionPart);
+                }
+
+                // Calculate modifiers as a result of being a SNAPSHOT or RC
+                float modifiedMinPart = minVersionPartInteger + calculateModifier(minVersionPart);
+                float modifiedVPart = versionPartInteger + calculateModifier(versionPart);
+
+                int comparison = Float.compare(modifiedVPart, modifiedMinPart);
+                if (comparison != 0) {
+                    return comparison;
                 }
             }
         }
-        System.err.println("fish.payara.samples.PayaraVersion.fromString(). No known payara version of " + plainVersion);
-        throw new IllegalArgumentException("No PayaraVersion of '"+plainVersion+"' listed in enum");
+        return 0;
     }
-    
-    /**
-     * Determines if the current version being tested (based on system property) is excluded for the given version
-     * @param since what version of Payara testing is applicable since
-     * @return whether to exclude from being tested
-     */
-    public static boolean isPayaraSystemPropertyVersionExcludedFromTestPriorTo(PayaraVersion since){
-        
-        if (System.getProperty(PAYARA_VERSION_PROPERTY_NAME) != null) {
 
-            try {
-
-                PayaraVersion systemPropertyVersion = fromString(System.getProperty(PAYARA_VERSION_PROPERTY_NAME));
-                return systemPropertyVersion.isExcludedFromTestPriorTo(since);
-
-            } catch (IllegalArgumentException exception) {
-                //no match for system property version, so can't say to exclude
-            }
+    private static int extractInteger(String string) {
+        try {
+            return Integer.parseInt("0" + string.replaceAll("[^0-9]", ""));
+        } catch (Exception ex) {
+            return 0;
         }
-        return false;
     }
-    
-    /**
-     * A method used to determine if we're using the payara-micro profile when running the test suite
-     * Method will be used in conjunction with the <code>@NotMicroCompatible</code> annotation
-     * 
-     * @return whether or not it's running micro profile 
-     */
-    public static boolean isUsingPayaraMicroProfile() {
-        if(System.getProperty("isUsingMicroProfile").equals("true")) {
-            return true;
+
+    private static float calculateModifier(String versionPart) {
+        versionPart = versionPart.toUpperCase();
+        if (versionPart.contains("-SNAPSHOT")) {
+            return -0.5f;
         }
-        return false;
-    }
-    
-    public boolean isExcludedFromTestPriorTo(PayaraVersion since){
-
-        if (since != null) {
-
-            if (this.ordinal() < since.ordinal()) {
-                return true;
-            }
-            
+        if (versionPart.contains("RC")) {
+            return -1.5f;
         }
-
-        return false;
-
+        return 0;
     }
-
 }

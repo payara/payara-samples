@@ -39,7 +39,6 @@
  */
 package fish.payara.samples.jaxws.endpoint.ejb;
 
-import static fish.payara.samples.PayaraVersion.PAYARA_5_193;
 import static org.junit.Assert.assertEquals;
 import static org.junit.runners.MethodSorters.NAME_ASCENDING;
 
@@ -72,7 +71,7 @@ import fish.payara.samples.SincePayara;
  */
 @RunWith(PayaraArquillianTestRunner.class)
 @FixMethodOrder(NAME_ASCENDING)
-@SincePayara(PAYARA_5_193)
+@SincePayara("5.193")
 public class JAXWSEndPointTest {
     
     @ArquillianResource
