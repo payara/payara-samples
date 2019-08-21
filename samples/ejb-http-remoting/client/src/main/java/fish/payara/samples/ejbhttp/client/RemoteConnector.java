@@ -67,7 +67,7 @@ public enum RemoteConnector {
         environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
         environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
         environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_SERIALIZATION, type.toString());
-        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_VERSION, String.valueOf(version));
+        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_PROTOCOL_VERSION, String.valueOf(version));
         try {
             ejbRemoteContext = new InitialContext(environment);
         } catch (NamingException e) {
