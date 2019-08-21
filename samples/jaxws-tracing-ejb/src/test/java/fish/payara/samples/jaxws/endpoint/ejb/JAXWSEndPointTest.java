@@ -39,13 +39,12 @@
  */
 package fish.payara.samples.jaxws.endpoint.ejb;
 
+import static fish.payara.samples.CliCommands.payaraGlassFish;
 import static org.junit.Assert.assertEquals;
 import static org.junit.runners.MethodSorters.NAME_ASCENDING;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
@@ -54,16 +53,16 @@ import javax.xml.ws.Service;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import fish.payara.samples.CliCommands;
 import fish.payara.samples.PayaraArquillianTestRunner;
+import fish.payara.samples.PayaraTestShrinkWrap;
 import fish.payara.samples.SincePayara;
 
 /**
@@ -86,32 +85,9 @@ public class JAXWSEndPointTest {
 
     @Deployment
     public static WebArchive createDeployment() {
-        
-        List<String> tracingCmd = new ArrayList<>();
-        
-        tracingCmd.add("set-requesttracing-configuration");
-        tracingCmd.add("--thresholdValue=25");
-        tracingCmd.add("--enabled=true");
-        tracingCmd.add("--target=server-config");
-        tracingCmd.add("--thresholdUnit=MICROSECONDS");
-        tracingCmd.add("--dynamic=true");
-
-        CliCommands.payaraGlassFish(tracingCmd);
-        
-
-        List<String> cdiCmd = new ArrayList<>();
-        
-        cdiCmd.add("notification-cdieventbus-configure");
-        cdiCmd.add("--loopBack=true");
-        cdiCmd.add("--dynamic=true");
-        cdiCmd.add("--enabled=true");
-        cdiCmd.add("--hazelcastEnabled=true");
-
-        CliCommands.payaraGlassFish(cdiCmd);
-        
-        
-        return ShrinkWrap.create(WebArchive.class).
-            addPackage(JAXWSEndPointImplementation.class.getPackage());
+        return PayaraTestShrinkWrap
+                .getWebArchive()
+                .addPackage(JAXWSEndPointImplementation.class.getPackage());
     }
 
     @Before
@@ -139,25 +115,40 @@ public class JAXWSEndPointTest {
     public void test2ServerCheck() throws MalformedURLException {
         assertEquals(true, traceMonitor.isObserverCalled());
     }
+
+    @BeforeClass
+    public static void setup() {
+        payaraGlassFish(
+            "set-requesttracing-configuration",
+            "--thresholdValue=25",
+            "--enabled=true",
+            "--target=server-config",
+            "--thresholdUnit=MICROSECONDS",
+            "--dynamic=true"
+        );
+        
+        payaraGlassFish(
+            "notification-cdieventbus-configure",
+            "--loopBack=true",
+            "--dynamic=true",
+            "--enabled=true",
+            "--hazelcastEnabled=true"
+        );
+    }
     
     @AfterClass
     public static void cleanup() {
-        List<String> tracingCmd = new ArrayList<>();
-        
-        tracingCmd.add("set-requesttracing-configuration");
-        tracingCmd.add("--enabled=false");
-        tracingCmd.add("--dynamic=true");
+        payaraGlassFish(
+            "set-requesttracing-configuration",
+            "--enabled=false",
+            "--dynamic=true"
+        );
 
-        CliCommands.payaraGlassFish(tracingCmd);
-        
-
-        List<String> cdiCmd = new ArrayList<>();
-        
-        cdiCmd.add("notification-cdieventbus-configure");
-        cdiCmd.add("--enabled=false");
-        cdiCmd.add("--dynamic=true");
-
-        CliCommands.payaraGlassFish(cdiCmd);
+        payaraGlassFish(
+            "notification-cdieventbus-configure",
+            "--enabled=false",
+            "--dynamic=true"
+        );
     }
    
 }

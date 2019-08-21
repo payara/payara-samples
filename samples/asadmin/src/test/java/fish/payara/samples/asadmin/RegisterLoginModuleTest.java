@@ -40,19 +40,17 @@
 
 package fish.payara.samples.asadmin;
 
-import com.google.common.io.CharStreams;
-import java.io.BufferedWriter;
-import org.glassfish.embeddable.CommandResult;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.regex.Pattern;
-import org.junit.After;
-import static org.junit.Assert.assertEquals;
+
+import org.glassfish.embeddable.CommandResult;
+import org.junit.Test;
 
 public class RegisterLoginModuleTest extends AsadminTest {
 
@@ -119,11 +117,24 @@ public class RegisterLoginModuleTest extends AsadminTest {
 
     private String loginConf() throws IOException {
         File loginConf = new File(System.getProperty("java.security.auth.login.config"));
-        try (
-                Reader reader = new FileReader(loginConf);
-        ) {
-            return CharStreams.toString(reader);
+        try (Reader reader = new FileReader(loginConf)) {
+            return toString(reader);
         }
+    }
+
+    private static String toString(Reader from) throws IOException {
+
+        // Create output and buffer
+        StringBuilder to = new StringBuilder();
+        char[] buf = new char[0x800];
+
+        // Read from reader to buffer
+        int nRead;
+        while ((nRead = from.read(buf)) != -1) {
+            to.append(buf, 0, nRead);
+        }
+
+        return to.toString();
     }
 
 }

@@ -46,6 +46,9 @@ import static org.junit.Assert.assertThat;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import com.sun.enterprise.config.serverbeans.Domain;
+import com.sun.enterprise.config.serverbeans.DomainExtension;
+
 import org.glassfish.api.admin.config.ConfigExtension;
 import org.glassfish.common.util.admin.UnacceptableValueException;
 import org.glassfish.embeddable.CommandResult;
@@ -57,16 +60,12 @@ import org.glassfish.internal.api.Target;
 import org.hamcrest.CoreMatchers;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.jvnet.hk2.config.UnsatisfiedDependencyException;
 
-import com.sun.enterprise.config.serverbeans.Domain;
-import com.sun.enterprise.config.serverbeans.DomainExtension;
-
 import fish.payara.samples.PayaraArquillianTestRunner;
+import fish.payara.samples.PayaraTestShrinkWrap;
 
 @RunWith(PayaraArquillianTestRunner.class)
 public abstract class AsadminTest {
@@ -77,11 +76,8 @@ public abstract class AsadminTest {
 
     @Deployment
     public static Archive<?> deploy() {
-        return ShrinkWrap.create(JavaArchive.class)
-                .addClasses(AsadminTest.class, PayaraArquillianTestRunner.class, 
-                    fish.payara.samples.SincePayara.class, 
-                    fish.payara.samples.NotMicroCompatible.class, 
-                    fish.payara.samples.PayaraVersion.class);
+        return PayaraTestShrinkWrap.getJavaArchive()
+                .addClasses(AsadminTest.class);
     }
 
     @Before
