@@ -136,6 +136,14 @@
             <properties>
                 <payara.directory.name>payara41</payara.directory.name>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>fish.payara.arquillian</groupId>
+                    <artifactId>payara-client-ee7</artifactId>
+                    <version>1.1</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
 
         <profile>
@@ -146,6 +154,14 @@
             <properties>
                 <payara.directory.name>payara5</payara.directory.name>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>fish.payara.arquillian</groupId>
+                    <artifactId>payara-client-ee8</artifactId>
+                    <version>1.1</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
 
         <profile>
@@ -171,11 +187,11 @@
 
         <profile>
             <!-- 
-                This profile will install a Payara server and start up the server per sample. Useful for CI servers. 
-                The Payara version that's used can be set via the payara.container.version property. 
-                
-                This is the default profile and does not have to be specified explicitly.
-                -->
+            This profile will install a Payara server and start up the server per sample. Useful for CI servers.
+            The Payara version that's used can be set via the payara.container.version property.
+
+            This is the default profile and does not have to be specified explicitly.
+            -->
             <id>payara-server-managed</id>
 
             <activation>
@@ -183,10 +199,6 @@
             </activation>
 
             <dependencies>
-                <dependency>
-                    <groupId>fish.payara.arquillian</groupId>
-                    <artifactId>payara-client-ee7</artifactId>
-                </dependency>
 
                 <!-- The actual Arquillian connector -->
                 <dependency>
@@ -258,10 +270,10 @@
             <id>payara-micro-managed</id>
             
             <!-- 
-                This profile will install a Payara Micro and start up the server per sample. Useful for CI servers. 
-                The Payara version that's used can be set via the payara.version property. 
-                
-                -->
+            This profile will install a Payara Micro and start up the server per sample. Useful for CI servers.
+            The Payara version that's used can be set via the payara.version property.
+
+            -->
                 
             <properties>
                 <skipJMS>true</skipJMS>
@@ -272,11 +284,7 @@
 
             <dependencies>
                 <!-- Java EE based client dependencies to contact a server via WebSocket
-                    or REST -->
-                <dependency>
-                    <groupId>fish.payara.arquillian</groupId>
-                    <artifactId>payara-client-ee7</artifactId>
-                </dependency>
+                or REST -->
 
                 <!-- The Arquillian connector -->
                 <dependency>
@@ -332,22 +340,18 @@
             <id>payara-server-remote</id>
             
             <!-- 
-                This profile requires you to start up a Payara server outside of the build. 
-                
-                Each sample will then reuse this instance to run the tests. 
-                Useful for development to avoid the server start up cost per sample.
+            This profile requires you to start up a Payara server outside of the build.
             
-                -->
+            Each sample will then reuse this instance to run the tests.
+            Useful for development to avoid the server start up cost per sample.
+
+            -->
 
             <!-- http remoting tests are only available remote, with asadmin enable-ejb-invoker -->
             <modules>
                 <module>ejb-http-remoting</module>
             </modules>
             <dependencies>
-                <dependency>
-                    <groupId>fish.payara.arquillian</groupId>
-                    <artifactId>payara-client-ee7</artifactId>
-                </dependency>
 
                 <!-- The actual Arquillian connector -->
                 <dependency>
@@ -377,8 +381,8 @@
         </profile>
 
         <!-- Activate this profile to download javadoc and sources jars. run: mvn
-            process-resources -Ddownload Notice: This feature has been removed with plugin
-            version 2.5, so keep this plugin configuration in a profile section. -->
+        process-resources -Ddownload Notice: This feature has been removed with plugin
+        version 2.5, so keep this plugin configuration in a profile section. -->
         <profile>
             <id>javadocs</id>
             <activation>
