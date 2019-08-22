@@ -61,6 +61,14 @@
 
     <profiles>
         <profile>
+            <id>payara-server-managed</id>
+            <modules>
+                <module>api</module>
+                <module>server-app</module>
+                <module>client</module>
+            </modules>
+        </profile>
+        <profile>
             <id>payara-server-remote</id>
             <modules>
                 <module>api</module>
