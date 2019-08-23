@@ -37,54 +37,46 @@
  *    only if the new code is made subject to such option by the copyright
  *    holder.
  */
+package fish.payara.samples.jaxws.endpoint;
 
-package fish.payara.samples.ejbhttp.client;
+import java.util.List;
+import java.util.logging.Logger;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 
-import fish.payara.ejb.http.client.RemoteEJBContextFactory;
-import fish.payara.ejb.http.protocol.SerializationType;
+import fish.payara.micro.cdi.Inbound;
+import fish.payara.notification.eventbus.EventbusMessage;
+import fish.payara.notification.requesttracing.RequestTraceSpan;
+import fish.payara.notification.requesttracing.RequestTracingNotificationData;
 
-import java.util.Hashtable;
+@ApplicationScoped
+public class TraceMonitor {
+    
+    private boolean observerCalled;
+    
+    private static final Logger logger = Logger.getLogger(TraceMonitor.class.getName());
 
-import static javax.naming.Context.INITIAL_CONTEXT_FACTORY;
-import static javax.naming.Context.PROVIDER_URL;
-
-public enum RemoteConnector {
-    JSON_V0(SerializationType.JSON, 0),
-    JSON_V1(SerializationType.JSON, 1),
-    JAVA_V1(SerializationType.JAVA, 1);
-
-    private final InitialContext ejbRemoteContext;
-    private final SerializationType type;
-    private final int version;
-
-    RemoteConnector(SerializationType type, int version) {
-        this.type = type;
-        this.version = version;
-        Hashtable<String, String> environment = new Hashtable<>();
-        environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
-        environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
-        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_SERIALIZATION, type.toString());
-        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_PROTOCOL_VERSION, String.valueOf(version));
-        try {
-            ejbRemoteContext = new InitialContext(environment);
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
+    public void observe(@Observes @Inbound EventbusMessage event) {
+        
+        if (event.getData() instanceof RequestTracingNotificationData) {
+            RequestTracingNotificationData notificationData = (RequestTracingNotificationData) event.getData();
+            
+            List<RequestTraceSpan> spans = notificationData.getRequestTrace().getTraceSpans();
+            
+            for (int i = 0; i < spans.size(); i++) {
+                if ("customOperation".equals(spans.get(i).getEventName())) {
+                    observerCalled = true;
+                }
+            }
+           
         }
+        
+        logger.info("CDI notifier: " + event.getMessage());
     }
-
-    @SuppressWarnings("unchecked")
-    public <T> T lookup(String jndiName) throws NamingException {
-        return (T) ejbRemoteContext.lookup(jndiName);
+    
+    public boolean isObserverCalled() {
+        return observerCalled;
     }
-
-    public SerializationType getSerializationType() {
-        return type;
-    }
-
-    public int getVersion() {
-        return version;
-    }
+    
 }

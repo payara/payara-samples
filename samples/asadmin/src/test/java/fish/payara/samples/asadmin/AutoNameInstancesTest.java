@@ -47,7 +47,7 @@ import org.glassfish.embeddable.CommandResult;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-@SincePayara(PayaraVersion.PAYARA_5_193)
+@SincePayara("5.193")
 @NotMicroCompatible
 public class AutoNameInstancesTest extends AsadminTest {
 

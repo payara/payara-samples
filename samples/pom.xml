@@ -21,8 +21,7 @@
         <module>jacc-per-app</module>
         <module>jaxrs-rolesallowed</module>
         <module>jaxrs-rolesallowed-servlet</module>
-        <module>jaxws-tracing-ejb</module>
-        <module>jaxws-tracing-servlet</module>
+        <module>jaxws-tracing</module>
         <module>rolesPermitted</module>
         <module>oauth2</module>
         <module>openid</module>

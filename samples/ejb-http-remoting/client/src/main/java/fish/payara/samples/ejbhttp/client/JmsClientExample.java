@@ -67,7 +67,7 @@ public enum JmsClientExample {
         Hashtable<String, Object> environment = new Hashtable<>();
         environment.put(INITIAL_CONTEXT_FACTORY, "fish.payara.ejb.rest.client.RemoteEJBContextFactory");
         environment.put(PROVIDER_URL, "http://localhost:8080/ejb-invoker");
-        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_VERSION, version);
+        environment.put(RemoteEJBContextFactory.JAXRS_CLIENT_PROTOCOL_VERSION, version);
         try {
             // Prepare Client locally
             QueueConnectionFactory jmsConnectionFactory = new QueueConnectionFactory();

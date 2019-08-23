@@ -49,6 +49,10 @@
         <module>classpath</module>
     </modules>
 
+    <dependencies>
+        <!-- DO NOT ADD DEPENDENCIES -->
+    </dependencies>
+
     <dependencyManagement>
         <dependencies>
             <!-- Java EE -->

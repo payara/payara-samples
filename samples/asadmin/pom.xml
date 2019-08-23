@@ -37,7 +37,7 @@
 
     <artifactId>asadmin</artifactId>
     <name>Payara Samples - Payara - AsAdmin</name>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

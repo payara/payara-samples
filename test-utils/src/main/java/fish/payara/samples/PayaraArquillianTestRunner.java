@@ -39,72 +39,45 @@
  */
 package fish.payara.samples;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
-import org.jboss.arquillian.junit.Arquillian;
-
-import static fish.payara.samples.PayaraVersion.isPayaraSystemPropertyVersionExcludedFromTestPriorTo;
-import static fish.payara.samples.PayaraVersion.isUsingPayaraMicroProfile;
 
 /**
- * An extension of the Arquillian Test Runner. 
- * To be used when {@link fish.payara.samples.SincePayara @SincePayara} is used in Payara Classes run with Arquillian.
- * Decides based on the annotations of {@link fish.payara.samples.SincePayara @SincePayara} which tests should be run
+ * An extension of the Arquillian Test Runner. To be used when
+ * {@link fish.payara.samples.SincePayara @SincePayara} is used in Payara
+ * Classes run with Arquillian. Decides based on the annotations of
+ * {@link fish.payara.samples.SincePayara @SincePayara} which tests should be
+ * run
  * 
- * See also PayaraTestRunner which is a copy of this class for plain JUnit test cases
+ * See also PayaraTestRunner which is a copy of this class for plain JUnit test
+ * cases
  * 
  * @see fish.payara.samples.PayaraTestRunner
  * @author Mark Wareham
  */
 public class PayaraArquillianTestRunner extends Arquillian {
-    
-    private boolean skipEntireClass;
+
+    private final PayaraTestRunnerDelegate delegate;
 
     public PayaraArquillianTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
-        
-        if (klass.getAnnotation(SincePayara.class) != null) {
-            SincePayara sincePayara = klass.getAnnotation(SincePayara.class);
-            skipEntireClass = isPayaraSystemPropertyVersionExcludedFromTestPriorTo(sincePayara.value());
-        }
-        
-        if (klass.getAnnotation(NotMicroCompatible.class) != null) {
-            skipEntireClass = isUsingPayaraMicroProfile();
-        }
+        this.delegate = new PayaraTestRunnerDelegate(klass);
     }
-    
+
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
-        
-        List<FrameworkMethod> result = new ArrayList<>();
-        
-        if (skipEntireClass) {
-            return result;
-        }
-        
-        for(FrameworkMethod testMethod : super.computeTestMethods()) {
-            
-             if (testMethod.getAnnotation(SincePayara.class) != null 
-                    && isPayaraSystemPropertyVersionExcludedFromTestPriorTo(testMethod.getAnnotation(SincePayara.class).value())) {
-                //don't add to test list
-            } else if (testMethod.getAnnotation(NotMicroCompatible.class) != null && isUsingPayaraMicroProfile()) {
-                //don't add to test list
-            } else {
-                result.add(testMethod);
-            }
-             
-        }
-        
-        return result;
+        return delegate.computeTestMethods();
     }
-    
+
     /**
      * Overrides parent to remove warning of no valid methods if none are applicable
-     * @param errors 
+     * 
+     * @param errors
      */
     @Override
     protected void validateInstanceMethods(List<Throwable> errors) {
