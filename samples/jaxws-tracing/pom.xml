@@ -11,6 +11,17 @@
     <packaging>jar</packaging>
     <name>Payara Samples - JAX-WS - Tracing</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>${skipJAXWS}</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.eclipse.microprofile</groupId>
