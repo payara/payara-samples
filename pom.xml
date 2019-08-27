@@ -76,9 +76,16 @@
                 <version>${payara.version}</version>
             </dependency>
             <dependency>
-                <groupId>fish.payara.extras</groupId>
-                <artifactId>payara-embedded-all</artifactId>
-                <version>${payara.version}</version>
+                <groupId>fish.payara.arquillian</groupId>
+                <artifactId>payara-client-ee8</artifactId>
+                <version>1.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>fish.payara.arquillian</groupId>
+                <artifactId>payara-client-ee7</artifactId>
+                <version>1.1</version>
+                <scope>test</scope>
             </dependency>
 
             <!-- MicroProfile Dependencies -->
@@ -152,6 +159,26 @@
                 <artifactId>dol</artifactId>
                 <version>${payara.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.main.common</groupId>
+                <artifactId>simple-glassfish-api</artifactId>
+                <version>${payara.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>fish.payara.payara-modules</groupId>
+                <artifactId>notification-core</artifactId>
+                <version>${payara.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>fish.payara.payara-modules</groupId>
+                <artifactId>healthcheck-core</artifactId>
+                <version>${payara.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>fish.payara.payara-modules</groupId>
+                <artifactId>healthcheck-stuck</artifactId>
+                <version>${payara.version}</version>
+            </dependency>
 
             <!-- Miscellaneous Utility Dependencies-->
             <dependency>
@@ -221,7 +248,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
 
     <build>
         <finalName>${project.artifactId}</finalName>
