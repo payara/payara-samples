@@ -41,8 +41,20 @@
 
     <dependencies>
         <dependency>
-            <groupId>fish.payara.extras</groupId>
-            <artifactId>payara-embedded-all</artifactId>
+            <groupId>org.glassfish.main.common</groupId>
+            <artifactId>simple-glassfish-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>fish.payara.payara-modules</groupId>
+            <artifactId>notification-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>fish.payara.payara-modules</groupId>
+            <artifactId>healthcheck-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>fish.payara.payara-modules</groupId>
+            <artifactId>healthcheck-stuck</artifactId>
         </dependency>
     </dependencies>
 </project>

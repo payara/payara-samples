@@ -43,8 +43,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>classpath</artifactId>
         <groupId>fish.payara.samples</groupId>
+        <artifactId>classpath</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
@@ -55,10 +55,32 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-        <dependency>
-            <groupId>fish.payara.extras</groupId>
-            <artifactId>payara-embedded-all</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>payara4</id>
+            <dependencies>
+                <dependency>
+                    <groupId>fish.payara.arquillian</groupId>
+                    <artifactId>payara-client-ee7</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    
+        <profile>
+            <id>payara5</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>fish.payara.arquillian</groupId>
+                    <artifactId>payara-client-ee8</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
