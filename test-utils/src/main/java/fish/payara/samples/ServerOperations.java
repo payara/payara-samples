@@ -74,7 +74,7 @@ public class ServerOperations {
 
         if ("glassfish-remote".equals(javaEEServer) || "payara-remote".equals(javaEEServer)) {
 
-            System.out.println("Adding user for glassfish-remote");
+            System.out.println("Adding user for " + javaEEServer);
 
             List<String> cmd = new ArrayList<>();
 
@@ -105,7 +105,11 @@ public class ServerOperations {
      * supported containers
      */
     public static void addUsersToContainerIdentityStore() {
-        
+        addUsersToContainerIdentityStore("u1", "g1", "file");
+    }
+
+    public static void addUsersToContainerIdentityStore(String username, String group, String fileAuthRealmName) {
+
         // TODO: abstract adding container managed users to utility class
         // TODO: consider PR for sending CLI commands to Arquillian
         
@@ -113,17 +117,19 @@ public class ServerOperations {
         
         if ("glassfish-remote".equals(javaEEServer) || "payara-remote".equals(javaEEServer)) {
             
-            System.out.println("Adding user for glassfish-remote");
+            System.out.println("Adding user for " + javaEEServer);
             
             List<String> cmd = new ArrayList<>();
             
             cmd.add("create-file-user");
             cmd.add("--groups");
-            cmd.add("g1");
+            cmd.add(group);
             cmd.add("--passwordfile");
             cmd.add(Paths.get("").toAbsolutePath() + "/src/test/resources/password.txt");
+            cmd.add("--authrealmname");
+            cmd.add(fileAuthRealmName);
             
-            cmd.add("u1");
+            cmd.add(username);
             
             CliCommands.payaraGlassFish(cmd);
         } else {
@@ -581,6 +587,17 @@ public class ServerOperations {
             throw new IllegalStateException("No https URL could be created from " + base);
         }
 
+        webClient.getOptions().setSSLTrustStore(getClientTrustStoreURL(baseHttps, clientKeyStorePath), "changeit", "jks");
+
+        System.out.println("Using client key store from: " + clientKeyStorePath);
+
+        // Client -> Server : the key store's private keys and certificates are used to sign
+        // and sent a reply to the server
+        webClient.getOptions().setSSLClientCertificate(new File(clientKeyStorePath).toURI().toURL(), "changeit", "jks");
+        return baseHttps;
+    }
+
+    public static URL getClientTrustStoreURL(URL baseHttps, String clientKeyStorePath) throws MalformedURLException {
         // ### Ask the server for its certificate and add that to a new local trust store
         // Server -> client : the trust store certificates are used to validate the certificate sent
         // by the server
@@ -594,28 +611,29 @@ public class ServerOperations {
             System.setProperty("javax.net.ssl.truststore", trustStorePath);
 
             System.out.println("Reading trust store from: " + trustStorePath);
-
-            webClient.getOptions().setSSLTrustStore(new File(trustStorePath).toURI().toURL(), "changeit", "jks");
-
-            // If the use.cnHost property is we try to extract the host from the server
-            // certificate and use exactly that host for our requests.
-            // This is needed if a server is listening to multiple host names, for instance
-            // localhost and example.com. If the certificate is for example.com, we can't
-            // localhost for the request, as that will not be accepted.
-            if (System.getProperty("use.cnHost") != null) {
-                System.out.println("use.cnHost set. Trying to grab CN from certificate and use as host for requests.");
-                baseHttps = getHostFromCertificate(serverCertificateChain, baseHttps);
-            }
+            return new File(trustStorePath).toURI().toURL();
         } else {
-            System.out.println("Could not obtain certificates from server. Continuing without custom truststore");
+            throw new IllegalStateException("Could not obtain certificates from server. Continuing without custom truststore");
+        }
+    }
+
+    public static KeyStore getKeyStore(
+            final URL keystoreURL,
+            final String keystorePassword,
+            final String keystoreType) {
+
+        if (keystoreURL == null) {
+            return null;
         }
 
-        System.out.println("Using client key store from: " + clientKeyStorePath);
-
-        // Client -> Server : the key store's private keys and certificates are used to sign
-        // and sent a reply to the server
-        webClient.getOptions().setSSLClientCertificate(new File(clientKeyStorePath).toURI().toURL(), "changeit", "jks");
-        return baseHttps;
+        try {
+            final KeyStore keyStore = KeyStore.getInstance(keystoreType);
+            final char[] passwordChars = keystorePassword != null ? keystorePassword.toCharArray() : null;
+            keyStore.load(keystoreURL.openStream(), passwordChars);
+            return keyStore;
+        } catch (final IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
 
