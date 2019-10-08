@@ -1,5 +1,7 @@
 # Payara Samples
 
+**This project has moved. See [payara/Payara](https://github.com/payara/Payara/tree/master/appserver/tests/payara-samples)**
+
 This repository contains small Payara specific samples for EE related/additional functionality.
 
 ## Troubleshooting ##
